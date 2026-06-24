@@ -1,0 +1,41 @@
+# Captures (may contain personal library data)
+captures/*.pcap
+captures/*.har
+
+# Keep the directory
+!captures/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (for future client)
+node_modules/
+dist/
+*.log
+
+# Nested captures (personal library data)
+roon-internal-api/captures/
+roon-internal-api/node_modules/
+
+# C# build output
+roon-internal-api/oracle/obj/
+roon-internal-api/oracle/bin/
+.playwright-mcp/
+shot-*.png
+roon-web-*.png

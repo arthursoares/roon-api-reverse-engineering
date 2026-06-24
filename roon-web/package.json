@@ -1,0 +1,22 @@
+{
+  "name": "roon-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Web client showcasing the reverse-engineered Roon internal API",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs && node dist/server.js",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/ws": "^8.5.10",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.3.3"
+  }
+}

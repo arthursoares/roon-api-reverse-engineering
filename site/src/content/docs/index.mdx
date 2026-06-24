@@ -1,0 +1,104 @@
+---
+title: roon-internal-api
+description: Notes from poking at the private binary protocol Roon's desktop app uses to talk to a Core. A proof-of-concept, not a product.
+template: splash
+hero:
+  tagline: |
+    Roon ships a small, sandboxed extension API. Its own desktop app speaks a much richer
+    private protocol to the Core. This is a tinkering investigation into that protocol — how
+    far can you drive a Core from a script? It's a proof-of-concept put together for fun, not
+    a finished or supported tool.
+  actions:
+    - text: How this went
+      link: /journey/
+      icon: right-arrow
+      variant: primary
+    - text: Protocol notes
+      link: /protocol/overview/
+      icon: open-book
+      variant: minimal
+    - text: GitHub
+      link: https://github.com/arthursoares/roon-api-reverse-engineering
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+## Why bother
+
+Roon users have been asking for a more capable API for years. The official
+[`node-roon-api`](https://github.com/RoonLabs/node-roon-api) is deliberately limited — no
+metadata editing, no real library management, just a sandboxed slice of what the app can do.
+
+So this is the brute-force route: watch what the desktop client *itself* sends to the Core,
+figure out the wire format, and see how much of it you can replay from your own code. It's
+an experiment, not a product, and definitely not blessed by Roon.
+
+:::note[The one interesting finding]
+On the local network, the protocol doesn't seem to use any authentication. The thing I
+*expected* to be the wall — "mutations need a cloud auth token" — turned out (in my testing)
+to be wrong. A correctly-formed call against a live object reference just works. The actual
+hard part was the wire format and the fact that object references are ephemeral.
+[How I got there →](/journey/)
+:::
+
+:::caution[Stability & safety — read before you run it]
+This is an **internal protocol meant for Roon's own trusted code**, not a public API.
+**It will break:** Roon versions client and Core in lockstep and changes it freely, so any
+update can break this client. **Misuse can degrade your own Core:** the protocol isn't
+hardened for third parties, and there are resource-management obligations across the
+connection (releasing handles, tearing down subscriptions, completing callbacks) that a
+reverse-engineered client may not get right — getting them wrong can leak memory or compute
+*inside your own Roon Core*. Only point it at a Core you own and can restart. Roon's CTO
+[made these same points on the forum](https://community.roonlabs.com/t/reverse-engineering-the-roon-desktop-clients-local-protocol-typescript-client-docs/321731).
+:::
+
+## What seems to work
+
+This is one person tinkering against a single Core, confirmed by hand — not a test matrix
+across setups. Treat everything as "worked for me," not "guaranteed."
+
+<CardGrid>
+  <Card title="Protocol" icon="document">
+    Framing, varints, primitives, method calls, by-val structs, and the object graph are
+    mapped well enough to talk to a Core. Cross-checked against my own packet captures.
+  </Card>
+  <Card title="A TypeScript port" icon="seti:typescript">
+    ~14k LOC. Typed wrappers are code-generated for all ~1550 methods, but the vast majority
+    are untested — generated from metadata, not exercised live.
+  </Card>
+  <Card title="Tried by hand" icon="approve-check">
+    Reading the object graph, favoriting, playing an album, pause, standby, and a reversible
+    metadata edit each worked once or twice against my setup.
+  </Card>
+  <Card title="Lots still open" icon="puzzle">
+    Most notably full streaming-catalog search (arbitrary Tidal/Qobuz terms). In-library
+    search half-works. Plenty of rough edges. [Pitch in →](/contributing/)
+  </Card>
+</CardGrid>
+
+## Built with Claude
+
+Most of this — the protocol decoding, the TypeScript port, the codegen, and these docs —
+was done by pair-programming with [Claude](https://www.anthropic.com/claude) (Anthropic's
+Claude Code). It's as much an experiment in "how far can an AGI agent push a gnarly
+reverse-engineering task" as it is a Roon experiment.
+
+## Pages
+
+<CardGrid>
+  <LinkCard title="How this went" href="/journey/" description="The actual path: a wrong theory about auth, reading the decompiled client, and confirming there's no local auth." />
+  <LinkCard title="Protocol notes" href="/protocol/overview/" description="Wire format as I understand it: framing, varints, primitives, calls, structs, object graph." />
+  <LinkCard title="Using the client" href="/api/getting-started/" description="Point it at your own Core and try the bits that work. You supply your own connection details." />
+  <LinkCard title="Contributing" href="/contributing/" description="Capture traffic, find your own Core's details, run the checks, and help with the open bits." />
+</CardGrid>
+
+---
+
+:::caution[Use at your own risk]
+Independent reverse-engineering for interoperability and learning. **Not affiliated with,
+endorsed by, or supported by Roon Labs.** The protocol is private and unversioned — it can
+break on any Roon update. Only point this at a Core you own. See the
+[license & ethics note](/contributing/#license--ethics).
+:::

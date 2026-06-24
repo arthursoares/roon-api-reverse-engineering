@@ -1,0 +1,32 @@
+/* Understated, tinkering-lab feel: muted steel accent, mono headings,
+   slightly tighter measure. Nothing flashy. */
+:root {
+  --sl-color-accent-low: #16242f;
+  --sl-color-accent: #43708f;
+  --sl-color-accent-high: #b9cad8;
+  --sl-color-text-accent: #9fc0d6;
+}
+:root[data-theme='light'] {
+  --sl-color-accent-low: #d2dde6;
+  --sl-color-accent: #35637f;
+  --sl-color-accent-high: #1d3848;
+  --sl-color-text-accent: #2c576f;
+}
+
+/* Mono for the site title + headings — reads more "readme" than "landing page". */
+.site-title,
+h1,
+h2,
+h3 {
+  font-family: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+  letter-spacing: -0.01em;
+}
+
+/* Calm the splash hero down a notch. */
+.hero h1 {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+}
+.hero .tagline {
+  font-size: var(--sl-text-body);
+  color: var(--sl-color-gray-2);
+}
