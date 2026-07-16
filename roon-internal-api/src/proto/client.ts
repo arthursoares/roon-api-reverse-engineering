@@ -32,7 +32,9 @@ export interface RoonClientOptions {
   host: string;
   port?: number;
   serverBrokerId: Buffer;
-  /** profile Sooid (value bytes). Defaults to the captured stable profile. */
+  /** profile Sooid (value bytes). Defaults to the Profile object the Core
+   * pushes into the graph on connect — pass this only to pin a specific
+   * profile on a multi-profile Core. */
   profileSooid?: Buffer;
   /** ms to wait for the object graph to settle after getService. */
   settleMs?: number;
@@ -40,21 +42,43 @@ export interface RoonClientOptions {
 
 // The root service guid (stable). getService(root) populates the object graph.
 const ROOT_SERVICE_GUID = Buffer.from('bcd36e8478a3e111b2725b4a6188709b', 'hex');
-const DEFAULT_PROFILE = Buffer.from('3f01162027273a55d64bbf4a85f335410e2f', 'hex');
 
 export class RoonClient {
   readonly conn: RoonConnection;
   readonly remoting: RemotingClient;
   readonly graph = new ObjectGraph();
-  readonly profileSooid: Buffer;
+  private readonly explicitProfile?: Buffer;
+  private cachedProfile?: Buffer;
   private settleMs: number;
 
   constructor(opts: RoonClientOptions) {
     this.conn = new RoonConnection({ host: opts.host, port: opts.port, serverBrokerId: opts.serverBrokerId });
     this.remoting = new RemotingClient(this.conn);
     this.remoting.onPush = (f) => this.graph.ingest(f);
-    this.profileSooid = opts.profileSooid ?? DEFAULT_PROFILE;
+    this.explicitProfile = opts.profileSooid;
     this.settleMs = opts.settleMs ?? 2000;
+  }
+
+  /**
+   * The profile Sooid used by the library calls: the explicit option when
+   * given, else read from the Profile object in the graph (available after
+   * connect()). The old hardcoded default was one specific Core's profile id —
+   * on every other Core the server matched nothing against it, which is a big
+   * part of why search returned no results.
+   */
+  profile(): Buffer {
+    if (this.explicitProfile) return this.explicitProfile;
+    if (this.cachedProfile) return this.cachedProfile;
+    for (const o of this.graph.objects.values()) {
+      if (!o.typeName.endsWith('.Profile')) continue;
+      for (const [k, v] of Object.entries(o.fields)) {
+        if (k.endsWith('::ProfileId') && Buffer.isBuffer(v)) {
+          this.cachedProfile = v;
+          return v;
+        }
+      }
+    }
+    throw new Error('no Profile object in the graph yet — connect() first, or pass profileSooid');
   }
 
   /** Connect, establish the remoting session, and load the object graph. */
@@ -131,20 +155,52 @@ export class RoonClient {
     );
   }
 
+  /** ms to wait for UnifiedSearch result objects to stream into the graph. */
+  private searchSettleMs = 2000;
+
   /**
-   * Library::UnifiedSearch, then return content objects (album/track/performer/
-   * work) whose Title/Name matches `terms`. UnifiedSearch pushes matching result
-   * objects into the graph; we then substring-match titles. (Streaming results
-   * stream into lazy DataLists — see the build roadmap; in-library matches work.)
+   * Library::UnifiedSearch — library AND streaming-catalog results.
+   *
+   * Three fixes over the first cut, all from a capture diff against the
+   * official client's search:
+   * - SearchParameters members are declared with their FULL wire names
+   *   ("string Sooloos.Broker.Api.SearchParameters::Terms", …). The server
+   *   matches DEFTYPE members by name and silently DROPS unknown ones, so the
+   *   short names meant every parameter (terms included) was discarded — the
+   *   search ran empty and returned nothing.
+   * - The profile id comes from the graph (see profile()) instead of a
+   *   hardcoded Sooid that only ever existed on one Core.
+   * - Results are the objects the server pushes in response (graph diff), not
+   *   a title-substring scan of the whole graph: the server's matches don't
+   *   necessarily contain the terms in their title ("beatles abbey" → "Abbey
+   *   Road"), and a whole-graph scan resurfaces stale hits from earlier
+   *   searches.
    */
   async search(terms: string, maxCount = 50): Promise<RoonObject[]> {
     const params = this.structArg('Sooloos.Broker.Api.SearchParameters', [
-      { name: 'ProfileId', propType: PropertyType.Sooid, value: new BinaryWriter().sooid(this.profileSooid).toBuffer() },
-      { name: 'Terms', propType: PropertyType.String, value: new BinaryWriter().string(terms).toBuffer() },
-      { name: 'MaxCount', propType: PropertyType.Int, value: new BinaryWriter().integer(maxCount).toBuffer() },
-      { name: 'MaxTopResultCount', propType: PropertyType.Int, value: new BinaryWriter().integer(20).toBuffer() },
+      {
+        name: 'System.Sooid Sooloos.Broker.Api.SearchParameters::ProfileId',
+        propType: PropertyType.Sooid,
+        value: new BinaryWriter().sooid(this.profile()).toBuffer(),
+      },
+      {
+        name: 'string Sooloos.Broker.Api.SearchParameters::Terms',
+        propType: PropertyType.String,
+        value: new BinaryWriter().string(terms).toBuffer(),
+      },
+      {
+        name: 'int Sooloos.Broker.Api.SearchParameters::MaxCount',
+        propType: PropertyType.Int,
+        value: new BinaryWriter().integer(maxCount).toBuffer(),
+      },
+      {
+        name: 'int Sooloos.Broker.Api.SearchParameters::MaxTopResultCount',
+        propType: PropertyType.Int,
+        value: new BinaryWriter().integer(20).toBuffer(),
+      },
     ]);
-    await this.call(
+    const before = new Set(this.graph.objects.keys());
+    const res = await this.call(
       'Library',
       'UnifiedSearch',
       [
@@ -154,18 +210,15 @@ export class RoonClient {
       params,
       this.serviceOid('Library')
     );
-    await new Promise((r) => setTimeout(r, 1800)); // let result objects push
-    const needle = terms.toLowerCase();
+    if (!res.success) throw new Error(`UnifiedSearch failed: ${res.status}`);
+    await new Promise((r) => setTimeout(r, this.searchSettleMs)); // results stream in
     const wanted = ['AlbumLite', 'TrackLite', 'PerformerLite', 'WorkLite'];
-    const seen = new Set<string>();
     const out: RoonObject[] = [];
-    for (const o of this.graph.objects.values()) {
+    for (const [k, o] of this.graph.objects) {
+      if (before.has(k)) continue;
       if (!wanted.some((w) => o.typeName.endsWith(w))) continue;
-      const title = this.strField(o, '::Title') ?? this.strField(o, '::Name');
-      if (title && title.toLowerCase().includes(needle) && !seen.has(o.oid.toString())) {
-        seen.add(o.oid.toString());
-        out.push(o);
-      }
+      out.push(o);
+      if (out.length >= maxCount) break;
     }
     return out;
   }
@@ -189,7 +242,7 @@ export class RoonClient {
     const params = this.structArg('Sooloos.Broker.Api.VirtualQueryParameters', [
       { name: 'PageSize', propType: PropertyType.Int, value: new BinaryWriter().integer(pageSize).toBuffer() },
     ]);
-    const args = Buffer.concat([buildArgs([Arg.sooid(this.profileSooid)]), criteria, params]);
+    const args = Buffer.concat([buildArgs([Arg.sooid(this.profile())]), criteria, params]);
     const res = await this.call(
       'Library',
       'VirtualAlbumQuery',
@@ -251,7 +304,7 @@ export class RoonClient {
         { type: 'FavoriteBanState', name: 'state' },
         { type: 'ResultCallback', name: 'cb' },
       ],
-      buildArgs([Arg.sooid(this.profileSooid), Arg.ref(albumOid), Arg.enum_(favorite ? 1 : 0)]),
+      buildArgs([Arg.sooid(this.profile()), Arg.ref(albumOid), Arg.enum_(favorite ? 1 : 0)]),
       this.serviceOid('Library')
     );
   }
@@ -260,7 +313,7 @@ export class RoonClient {
   async playAlbum(zoneOid: bigint, albumOid: bigint): Promise<CallResult> {
     const ppTypeId = this.remoting.defineType('Sooloos.Broker.Api.PlayParameters', []);
     const args = Buffer.concat([
-      buildArgs([Arg.ref(zoneOid), Arg.sooid(this.profileSooid)]),
+      buildArgs([Arg.ref(zoneOid), Arg.sooid(this.profile())]),
       inlineStruct(ppTypeId),
       buildArgs([Arg.ref(albumOid), Arg.bool(false), Arg.bool(false)]),
     ]);
@@ -285,7 +338,7 @@ export class RoonClient {
   async playTrack(zoneOid: bigint, trackOid: bigint): Promise<CallResult> {
     const ppTypeId = this.remoting.defineType('Sooloos.Broker.Api.PlayParameters', []);
     const args = Buffer.concat([
-      buildArgs([Arg.ref(zoneOid), Arg.sooid(this.profileSooid)]),
+      buildArgs([Arg.ref(zoneOid), Arg.sooid(this.profile())]),
       inlineStruct(ppTypeId),
       buildArgs([Arg.ref(trackOid)]),
     ]);
