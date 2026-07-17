@@ -9,7 +9,12 @@
  *   - enum            -> flexInt(value)               (Arg.enum_)
  *   - string/bool/... -> primitive                   (Arg.str/bool/int/long/double)
  *   - byte[]          -> integer(len) + bytes         (Arg.bytes)
+ *   - IEnumerable<T>  -> flexInt(bodyLen) + flexInt(count) + serialized elements
+ *                        (Arg.collection; elements are e.g. inlineStruct buffers)
  *   - IEnumerable<ref>-> integer(count) + refs        (Arg.refList)
+ *     CAUTION: refList is NOT a valid encoding for struct-typed collection
+ *     params (IEnumerable<AlbumBase> and friends) — the server stalls on it.
+ *     Those want Arg.collection of inline value structs; see favoriteAlbum.
  *   - ResultCallback  -> omitted (response travels via the request id)
  */
 import { BinaryWriter } from './writer';
@@ -18,6 +23,7 @@ export type Arg =
   | { kind: 'sooid'; value: Uint8Array }
   | { kind: 'ref'; oid: bigint | number }
   | { kind: 'refList'; oids: (bigint | number)[] }
+  | { kind: 'collection'; elements: Buffer[] }
   | { kind: 'enum'; value: number }
   | { kind: 'str'; value: string | null }
   | { kind: 'bool'; value: boolean }
@@ -30,6 +36,8 @@ export const Arg = {
   sooid: (value: Uint8Array): Arg => ({ kind: 'sooid', value }),
   ref: (oid: bigint | number): Arg => ({ kind: 'ref', oid }),
   refList: (oids: (bigint | number)[]): Arg => ({ kind: 'refList', oids }),
+  /** Length-prefixed collection of pre-serialized elements (IEnumerable<T> of structs). */
+  collection: (elements: Buffer[]): Arg => ({ kind: 'collection', elements }),
   enum_: (value: number): Arg => ({ kind: 'enum', value }),
   str: (value: string | null): Arg => ({ kind: 'str', value }),
   bool: (value: boolean): Arg => ({ kind: 'bool', value }),
@@ -110,6 +118,15 @@ function writeArg(w: BinaryWriter, a: Arg): void {
       w.integer(a.oids.length);
       for (const oid of a.oids) w.long(oid);
       break;
+    case 'collection': {
+      // Captured wire format (validated byte-for-byte against the official
+      // client's FavoriteOrBan): flexInt(bodyLen) + flexInt(count) + elements.
+      const inner = new BinaryWriter().flexInt(a.elements.length);
+      for (const e of a.elements) inner.bytes(e);
+      const body = inner.toBuffer();
+      w.flexInt(body.length).bytes(body);
+      break;
+    }
     case 'enum':
       w.flexInt(a.value);
       break;

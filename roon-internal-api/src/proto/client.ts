@@ -9,7 +9,7 @@
  *   const roon = new RoonClient({ host: 'YOUR_CORE_IP', serverBrokerId });
  *   await roon.connect();
  *   const album = roon.findByTitle('AlbumLite', 'Clube Da Esquina');
- *   await roon.favoriteAlbum(album!.oid, true);
+ *   await roon.favoriteAlbum(roon.albumIdOf(album!)!, true);
  *   await roon.playAlbumOnZone('HiFi', album!.oid);
  */
 import { RoonConnection } from './connection';
@@ -293,18 +293,48 @@ export class RoonClient {
 
   // --- typed convenience methods (proven live) ---
 
-  /** Favorite/unfavorite an album (FavoriteBanState: None=0, Favorite=1, Ban=2). */
-  favoriteAlbum(albumOid: bigint, favorite: boolean): Promise<CallResult> {
+  /** Serialize one AlbumBase as an inline AlbumLink value struct {AlbumId, Broker}. */
+  private albumLink(albumId: bigint): Buffer {
+    return this.structArg('Sooloos.Broker.Api.AlbumLink', [
+      {
+        name: 'long Sooloos.Broker.Api.AlbumLink::AlbumId',
+        propType: PropertyType.Long,
+        value: new BinaryWriter().long(albumId).toBuffer(),
+      },
+      {
+        name: 'Sooloos.Broker.Api.Broker Sooloos.Broker.Api.AlbumLink::Broker',
+        propType: PropertyType.Object,
+        value: new BinaryWriter().long(this.serviceOid('Broker')).toBuffer(),
+      },
+    ]);
+  }
+
+  /**
+   * Favorite/unfavorite an album (FavoriteBanState: None=0, Favorite=1, Ban=2).
+   *
+   * Takes the STABLE album id (albumIdOf), not a session oid. Uses the
+   * IEnumerable<AlbumBase> overload the official client uses; each element is
+   * an inline AlbumLink value struct {AlbumId, Broker}, and the collection is
+   * length-prefixed (Arg.collection). Both facts came from a byte-for-byte
+   * capture diff against the official client — the previous single-AlbumBase
+   * call with a bare object ref was silently ignored, and encoding the
+   * collection as a naive count+refs list stalls the Core.
+   */
+  favoriteAlbum(albumId: bigint, favorite: boolean): Promise<CallResult> {
     return this.call(
       'Library',
       'FavoriteOrBan',
       [
         { type: 'Sooid', name: 'profileid' },
-        { type: 'AlbumBase', name: 'album' },
+        { type: 'IEnumerable<AlbumBase>', name: 'albums' },
         { type: 'FavoriteBanState', name: 'state' },
         { type: 'ResultCallback', name: 'cb' },
       ],
-      buildArgs([Arg.sooid(this.profile()), Arg.ref(albumOid), Arg.enum_(favorite ? 1 : 0)]),
+      buildArgs([
+        Arg.sooid(this.profile()),
+        Arg.collection([this.albumLink(albumId)]),
+        Arg.enum_(favorite ? 1 : 0),
+      ]),
       this.serviceOid('Library')
     );
   }
