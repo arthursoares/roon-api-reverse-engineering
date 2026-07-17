@@ -15,7 +15,7 @@ that's the extent of the testing.
 
 ```ts
 const album = roon.findByTitle('AlbumLite', 'Kind of Blue');
-if (album) await roon.favoriteAlbum(album.oid, true);   // false to un-favorite
+if (album) await roon.favoriteAlbum(roon.albumIdOf(album)!, true);   // false to un-favorite
 ```
 
 Showed up in the Roon UI; reversible. `examples/live-favorite.ts`.

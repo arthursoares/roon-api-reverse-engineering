@@ -19,7 +19,7 @@ async function main() {
   console.log('Found album "Clube Da Esquina":', album ? `oid=${album.oid}` : 'not loaded');
 
   // Everything below is one-liners (left commented so the demo stays read-only):
-  //   if (album) await roon.favoriteAlbum(album.oid, true);
+  //   if (album) await roon.favoriteAlbum(roon.albumIdOf(album)!, true);
   //   await roon.playAlbumOnZone('HiFi', 'Clube Da Esquina');
   //   roon.zoneControl(roon.zoneByName('HiFi')!, 'Pause');
   //   roon.standby(roon.endpointByName('HiFi')!);

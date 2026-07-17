@@ -122,7 +122,11 @@ export async function setVolume(roon: RoonClient, endpointOid: string, value: nu
 
 /** Favorite/unfavorite an album (reversible). FavoriteBanState: None=0, Favorite=1. */
 export async function favorite(roon: RoonClient, oid: string, on: boolean): Promise<{ ok: boolean; status: string }> {
-  const r = await roon.favoriteAlbum(BigInt(oid), on);
+  // favoriteAlbum keys on the stable AlbumId, not the session oid the UI holds.
+  const album = roon.graph.getObject(BigInt(oid));
+  const albumId = album ? roon.albumIdOf(album) : undefined;
+  if (albumId === undefined) throw new Error(`album ${oid} not loaded or missing AlbumId`);
+  const r = await roon.favoriteAlbum(albumId, on);
   return { ok: r.success, status: r.status };
 }
 
