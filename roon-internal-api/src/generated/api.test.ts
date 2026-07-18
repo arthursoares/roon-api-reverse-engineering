@@ -48,6 +48,27 @@ describe('generated API (Phase B codegen)', () => {
     expect(hex.endsWith('0000')).toBe(true);
   });
 
+  test('reflist collection param emits the FIXED length-prefixed bare-ref framing', async () => {
+    // The reflist fix (tools/gen_client.ts): collection params serialize as a
+    // length-prefixed Arg.collection of bare refs, NOT the old Arg.refList
+    // (count + refs, no length prefix) that stalls the Core. The captured
+    // Transport::PlayWorks frame (roonctl tools/re/fixtures/reflist) pins the
+    // element encoding: oid 8105394 -> flexlong 83eedb32, framed as
+    // flexInt(bodyLen) + flexInt(count) + refs.
+    const { c, calls } = stub();
+    const lib = new LibraryApi(c, 46n);
+    await lib.getPersistentAlbumIds([8105394n]);
+    // bodyLen=5 (count byte + 4-byte ref), count=1, ref 83eedb32
+    expect(calls[0].args.toString('hex')).toBe('050183eedb32');
+
+    const { c: c2, calls: k2 } = stub();
+    await new LibraryApi(c2, 46n).getPersistentAlbumIds([8105394n, 8105394n]);
+    // bodyLen=9 (count byte + two 4-byte refs), count=2 — framing scales
+    expect(k2[0].args.toString('hex')).toBe('090283eedb3283eedb32');
+    // the old bare Arg.refList (count + refs, no length prefix) would be "0283eedb32…"
+    expect(k2[0].args.toString('hex').startsWith('02')).toBe(false);
+  });
+
   test('fire-and-forget method uses callMethodNoReply', () => {
     const { c, noReply } = stub();
     const z = new ZoneApi(c, 464116n);
