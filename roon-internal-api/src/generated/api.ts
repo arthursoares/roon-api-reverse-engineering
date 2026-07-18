@@ -966,16 +966,24 @@ export class VirtualQuery_2Api extends ServiceBase {
 }
 
 export class TransportApi extends ServiceBase {
+  /**
+   * reflist-audit: `endpoints` (Endpoint) — length-prefixed bare-ref collection,
+   * CONFIRMED byte-for-byte against the official client (capture 2026-07-17).
+   */
   async linkEndpoints(zone: bigint, endpoints: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(zone)]),
-      buildArgs([Arg.refList(endpoints)]),
+      buildArgs([Arg.collection((endpoints).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::LinkEndpoints(Sooloos.Broker.Api.Zone, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.Endpoint>, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `endpoints` (Endpoint) — length-prefixed bare-ref collection,
+   * CONFIRMED byte-for-byte against the official client (capture 2026-07-17).
+   */
   async unlinkEndpoints(endpoints: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(endpoints)]),
+      buildArgs([Arg.collection((endpoints).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::UnlinkEndpoints(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.Endpoint>, Base.ResultCallback)", Buffer.concat(parts));
   }
@@ -1047,12 +1055,16 @@ export class TransportApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::PlayTrack(Sooloos.Broker.Api.Zone, System.Sooid, Sooloos.Broker.Api.PlayParameters, Sooloos.Broker.Api.TrackBase, Base.ResultCallback<Sooloos.Broker.Api.PlayFeedback>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection,
+   * CONFIRMED byte-for-byte against the official client (capture 2026-07-17).
+   */
   async playTracks(zone: bigint, profileid: Uint8Array, parameters: Record<string, unknown>, tracks: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(zone)]),
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
       buildStruct(this.c, "Sooloos.Broker.Api.PlayParameters", (parameters ?? {})),
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::PlayTracks(Sooloos.Broker.Api.Zone, System.Sooid, Sooloos.Broker.Api.PlayParameters, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback<Sooloos.Broker.Api.PlayFeedback>)", Buffer.concat(parts));
   }
@@ -1067,12 +1079,17 @@ export class TransportApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::PlayAlbum(Sooloos.Broker.Api.Zone, System.Sooid, Sooloos.Broker.Api.PlayParameters, Sooloos.Broker.Api.AlbumBase, bool, bool, Base.ResultCallback<Sooloos.Broker.Api.PlayFeedback>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `album` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async playAlbums(zone: bigint, profileid: Uint8Array, parameters: Record<string, unknown>, album: (bigint | number)[], favoritesonly: boolean, includehidden: boolean): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(zone)]),
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
       buildStruct(this.c, "Sooloos.Broker.Api.PlayParameters", (parameters ?? {})),
-      buildArgs([Arg.refList(album)]),
+      buildArgs([Arg.collection((album).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.bool(Boolean(favoritesonly))]),
       buildArgs([Arg.bool(Boolean(includehidden))]),
     ];
@@ -1088,30 +1105,44 @@ export class TransportApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::PlayPlaylist(Sooloos.Broker.Api.Zone, System.Sooid, Sooloos.Broker.Api.PlayParameters, Sooloos.Broker.Api.Playlist, Sooloos.Broker.Api.PlaylistItem, Base.ResultCallback<Sooloos.Broker.Api.PlayFeedback>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `items` (PlaylistItem) — length-prefixed bare-ref collection,
+   * CONFIRMED byte-for-byte against the official client (capture 2026-07-17).
+   */
   async playPlaylistItems(zone: bigint, profileid: Uint8Array, parameters: Record<string, unknown>, items: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(zone)]),
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
       buildStruct(this.c, "Sooloos.Broker.Api.PlayParameters", (parameters ?? {})),
-      buildArgs([Arg.refList(items)]),
+      buildArgs([Arg.collection((items).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::PlayPlaylistItems(Sooloos.Broker.Api.Zone, System.Sooid, Sooloos.Broker.Api.PlayParameters, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PlaylistItem>, Base.ResultCallback<Sooloos.Broker.Api.PlayFeedback>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `items` (PlaylistItemBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async playPlaylistItemBases(zone: bigint, profileid: Uint8Array, parameters: Record<string, unknown>, items: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(zone)]),
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
       buildStruct(this.c, "Sooloos.Broker.Api.PlayParameters", (parameters ?? {})),
-      buildArgs([Arg.refList(items)]),
+      buildArgs([Arg.collection((items).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::PlayPlaylistItemBases(Sooloos.Broker.Api.Zone, System.Sooid, Sooloos.Broker.Api.PlayParameters, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PlaylistItemBase>, Base.ResultCallback<Sooloos.Broker.Api.PlayFeedback>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `playlists` (Playlist) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async playPlaylists(zone: bigint, profileid: Uint8Array, parameters: Record<string, unknown>, playlists: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(zone)]),
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
       buildStruct(this.c, "Sooloos.Broker.Api.PlayParameters", (parameters ?? {})),
-      buildArgs([Arg.refList(playlists)]),
+      buildArgs([Arg.collection((playlists).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::PlayPlaylists(Sooloos.Broker.Api.Zone, System.Sooid, Sooloos.Broker.Api.PlayParameters, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.Playlist>, Base.ResultCallback<Sooloos.Broker.Api.PlayFeedback>)", Buffer.concat(parts));
   }
@@ -1125,21 +1156,31 @@ export class TransportApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::PlayMix(Sooloos.Broker.Api.Zone, System.Sooid, Sooloos.Broker.Api.PlayParameters, Sooloos.Broker.Api.Mix, int, Base.ResultCallback<Sooloos.Broker.Api.PlayFeedback>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `items` (MixItem) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async playMixItems(zone: bigint, profileid: Uint8Array, parameters: Record<string, unknown>, items: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(zone)]),
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
       buildStruct(this.c, "Sooloos.Broker.Api.PlayParameters", (parameters ?? {})),
-      buildArgs([Arg.refList(items)]),
+      buildArgs([Arg.collection((items).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::PlayMixItems(Sooloos.Broker.Api.Zone, System.Sooid, Sooloos.Broker.Api.PlayParameters, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.MixItem>, Base.ResultCallback<Sooloos.Broker.Api.PlayFeedback>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `mixes` (Mix) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async playMixes(zone: bigint, profileid: Uint8Array, parameters: Record<string, unknown>, mixes: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(zone)]),
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
       buildStruct(this.c, "Sooloos.Broker.Api.PlayParameters", (parameters ?? {})),
-      buildArgs([Arg.refList(mixes)]),
+      buildArgs([Arg.collection((mixes).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::PlayMixes(Sooloos.Broker.Api.Zone, System.Sooid, Sooloos.Broker.Api.PlayParameters, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.Mix>, Base.ResultCallback<Sooloos.Broker.Api.PlayFeedback>)", Buffer.concat(parts));
   }
@@ -1153,12 +1194,17 @@ export class TransportApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::PlayPerformer(Sooloos.Broker.Api.Zone, System.Sooid, Sooloos.Broker.Api.PlayParameters, Sooloos.Broker.Api.PerformerBase, bool, Base.ResultCallback<Sooloos.Broker.Api.PlayFeedback>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performers` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async playPerformers(zone: bigint, profileid: Uint8Array, parameters: Record<string, unknown>, performers: (bigint | number)[], includehidden: boolean): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(zone)]),
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
       buildStruct(this.c, "Sooloos.Broker.Api.PlayParameters", (parameters ?? {})),
-      buildArgs([Arg.refList(performers)]),
+      buildArgs([Arg.collection((performers).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.bool(Boolean(includehidden))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::PlayPerformers(Sooloos.Broker.Api.Zone, System.Sooid, Sooloos.Broker.Api.PlayParameters, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, bool, Base.ResultCallback<Sooloos.Broker.Api.PlayFeedback>)", Buffer.concat(parts));
@@ -1174,12 +1220,16 @@ export class TransportApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::PlayWork(Sooloos.Broker.Api.Zone, System.Sooid, Sooloos.Broker.Api.PlayParameters, Sooloos.Broker.Api.WorkBase, bool, bool, Base.ResultCallback<Sooloos.Broker.Api.PlayFeedback>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `works` (WorkBase) — length-prefixed bare-ref collection,
+   * CONFIRMED byte-for-byte against the official client (capture 2026-07-17).
+   */
   async playWorks(zone: bigint, profileid: Uint8Array, parameters: Record<string, unknown>, works: (bigint | number)[], includehidden: boolean, includeallperformances: boolean): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(zone)]),
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
       buildStruct(this.c, "Sooloos.Broker.Api.PlayParameters", (parameters ?? {})),
-      buildArgs([Arg.refList(works)]),
+      buildArgs([Arg.collection((works).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.bool(Boolean(includehidden))]),
       buildArgs([Arg.bool(Boolean(includeallperformances))]),
     ];
@@ -1195,12 +1245,17 @@ export class TransportApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::PlayPerformance(Sooloos.Broker.Api.Zone, System.Sooid, Sooloos.Broker.Api.PlayParameters, Sooloos.Broker.Api.PerformanceBase, bool, Base.ResultCallback<Sooloos.Broker.Api.PlayFeedback>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performances` (PerformanceBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async playPerformances(zone: bigint, profileid: Uint8Array, parameters: Record<string, unknown>, performances: (bigint | number)[], includehidden: boolean): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(zone)]),
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
       buildStruct(this.c, "Sooloos.Broker.Api.PlayParameters", (parameters ?? {})),
-      buildArgs([Arg.refList(performances)]),
+      buildArgs([Arg.collection((performances).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.bool(Boolean(includehidden))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::PlayPerformances(Sooloos.Broker.Api.Zone, System.Sooid, Sooloos.Broker.Api.PlayParameters, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformanceBase>, bool, Base.ResultCallback<Sooloos.Broker.Api.PlayFeedback>)", Buffer.concat(parts));
@@ -1216,12 +1271,17 @@ export class TransportApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Transport::PlayComposer(Sooloos.Broker.Api.Zone, System.Sooid, Sooloos.Broker.Api.PlayParameters, Sooloos.Broker.Api.PerformerBase, bool, bool, Base.ResultCallback<Sooloos.Broker.Api.PlayFeedback>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `composers` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async playComposers(zone: bigint, profileid: Uint8Array, parameters: Record<string, unknown>, composers: (bigint | number)[], includehidden: boolean, includeallperformances: boolean): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(zone)]),
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
       buildStruct(this.c, "Sooloos.Broker.Api.PlayParameters", (parameters ?? {})),
-      buildArgs([Arg.refList(composers)]),
+      buildArgs([Arg.collection((composers).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.bool(Boolean(includehidden))]),
       buildArgs([Arg.bool(Boolean(includeallperformances))]),
     ];
@@ -1695,15 +1755,23 @@ export class QueueApi extends ServiceBase {
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Queue::PlayFromHere(long)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `items` (TransportItem) — length-prefixed bare-ref collection,
+   * CONFIRMED byte-for-byte against the official client (capture 2026-07-17).
+   */
   removeItems(items: (bigint | number)[]): void {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(items)]),
+      buildArgs([Arg.collection((items).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Queue::RemoveItems(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TransportItem>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `items` (TransportItem) — length-prefixed bare-ref collection,
+   * CONFIRMED byte-for-byte against the official client (capture 2026-07-17).
+   */
   async moveItems(items: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(items)]),
+      buildArgs([Arg.collection((items).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
@@ -1748,15 +1816,25 @@ export class SwimApi extends ServiceBase {
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Swim::ThumbsUp(Sooloos.Broker.Api.TransportItem)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `items` (TransportItem) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async addToQueue(items: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(items)]),
+      buildArgs([Arg.collection((items).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Swim::AddToQueue(System.Collections.Generic.IList<Sooloos.Broker.Api.TransportItem>, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `items` (TransportItem) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async pickAnother(items: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(items)]),
+      buildArgs([Arg.collection((items).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Swim::PickAnother(System.Collections.Generic.IList<Sooloos.Broker.Api.TransportItem>, Base.ResultCallback)", Buffer.concat(parts));
   }
@@ -1780,9 +1858,14 @@ export class SwimApi extends ServiceBase {
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Swim::Feedback(Sooloos.Broker.Api.TransportItem, string)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `items` (TransportItem) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   removeItems(items: (bigint | number)[]): void {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(items)]),
+      buildArgs([Arg.collection((items).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Swim::RemoveItems(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TransportItem>)", Buffer.concat(parts));
   }
@@ -2000,15 +2083,25 @@ export class RadioApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Radio::MakeStreamDefault(Sooloos.Broker.Api.Channel, Sooloos.Broker.Api.ChannelStream, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `channels` (Channel) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async addToLibrary(channels: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(channels)]),
+      buildArgs([Arg.collection((channels).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Radio::AddToLibrary(System.Collections.Generic.IList<Sooloos.Broker.Api.Channel>, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `channels` (Channel) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async removeFromLibrary(channels: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(channels)]),
+      buildArgs([Arg.collection((channels).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Radio::RemoveFromLibrary(System.Collections.Generic.IList<Sooloos.Broker.Api.Channel>, Base.ResultCallback)", Buffer.concat(parts));
   }
@@ -2453,9 +2546,14 @@ export class AudioDeviceSetupApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.AudioDeviceSetup::RAAT_SetUsePowerOfTwoBufferSize(bool, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `value` (ExternalSourceControl) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async setExternalSourceControls(value: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(value)]),
+      buildArgs([Arg.collection((value).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.AudioDeviceSetup::SetExternalSourceControls(System.Collections.Generic.IList<Sooloos.Broker.Api.ExternalSourceControl>, Base.ResultCallback)", Buffer.concat(parts));
   }
@@ -3059,15 +3157,25 @@ export class DspConfigApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.DspConfig::ResetToDefault(Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `items` (DspConfigItem) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async reorderItems(items: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(items)]),
+      buildArgs([Arg.collection((items).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.DspConfig::ReorderItems(System.Collections.Generic.IList<Sooloos.Broker.Api.DspConfigItem>, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `items` (DspConfigItem) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async removeItems(items: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(items)]),
+      buildArgs([Arg.collection((items).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.DspConfig::RemoveItems(System.Collections.Generic.IList<Sooloos.Broker.Api.DspConfigItem>, Base.ResultCallback)", Buffer.concat(parts));
   }
@@ -3373,15 +3481,25 @@ export class SpeakerSetupRuleApi extends ServiceBase {
 }
 
 export class PEQItemApi extends ServiceBase {
+  /**
+   * reflist-audit: `filters` (PEQFilter) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async reorderFilters(filters: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(filters)]),
+      buildArgs([Arg.collection((filters).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.PEQItem::ReorderFilters(System.Collections.Generic.IList<Sooloos.Broker.Api.PEQFilter>, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `filters` (PEQFilter) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async removeFilters(filters: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(filters)]),
+      buildArgs([Arg.collection((filters).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.PEQItem::RemoveFilters(System.Collections.Generic.IList<Sooloos.Broker.Api.PEQFilter>, Base.ResultCallback)", Buffer.concat(parts));
   }
@@ -3451,9 +3569,14 @@ export class PEQSOSApi extends ServiceBase {
 }
 
 export class PEQRemixApi extends ServiceBase {
+  /**
+   * reflist-audit: `rules` (PEQRemixRule) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async removeRules(rules: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(rules)]),
+      buildArgs([Arg.collection((rules).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.PEQRemix::RemoveRules(System.Collections.Generic.IList<Sooloos.Broker.Api.PEQRemixRule>, Base.ResultCallback)", Buffer.concat(parts));
   }
@@ -3830,15 +3953,25 @@ export class LibraryApi extends ServiceBase {
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Library::AddToLibrary(long)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `track` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   addToLibrary_4(track: (bigint | number)[]): void {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(track)]),
+      buildArgs([Arg.collection((track).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Library::AddToLibrary(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `album` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   addToLibrary_5(album: (bigint | number)[]): void {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(album)]),
+      buildArgs([Arg.collection((album).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Library::AddToLibrary(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>)", Buffer.concat(parts));
   }
@@ -3992,9 +4125,13 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetAlbumLites(System.Collections.Generic.IEnumerable<long>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumLite>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albumids` (AlbumBase) — length-prefixed bare-ref collection,
+   * CONFIRMED live: the Core accepts it (probe 2026-07-18). See docs/reflist-audit.md.
+   */
   async getAlbumLites_2(albumids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albumids)]),
+      buildArgs([Arg.collection((albumids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetAlbumLites(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumLite>>)", Buffer.concat(parts));
   }
@@ -4022,9 +4159,13 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetTrackLites(System.Collections.Generic.IEnumerable<long>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackLite>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `trackids` (TrackBase) — length-prefixed bare-ref collection,
+   * CONFIRMED live: the Core accepts it (probe 2026-07-18). See docs/reflist-audit.md.
+   */
   async getTrackLites_2(trackids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(trackids)]),
+      buildArgs([Arg.collection((trackids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetTrackLites(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackLite>>)", Buffer.concat(parts));
   }
@@ -4052,9 +4193,13 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetPerformerLites(System.Collections.Generic.IEnumerable<long>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PerformerLite>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performerids` (PerformerBase) — length-prefixed bare-ref collection,
+   * CONFIRMED live: the Core accepts it (probe 2026-07-18). See docs/reflist-audit.md.
+   */
   async getPerformerLites_2(performerids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(performerids)]),
+      buildArgs([Arg.collection((performerids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetPerformerLites(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PerformerLite>>)", Buffer.concat(parts));
   }
@@ -4076,9 +4221,13 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetWorkLites(System.Collections.Generic.IEnumerable<long>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.WorkLite>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `workids` (WorkBase) — length-prefixed bare-ref collection,
+   * CONFIRMED live: the Core accepts it (probe 2026-07-18). See docs/reflist-audit.md.
+   */
   async getWorkLites_2(workids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(workids)]),
+      buildArgs([Arg.collection((workids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetWorkLites(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.WorkBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.WorkLite>>)", Buffer.concat(parts));
   }
@@ -4130,9 +4279,13 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetExtendedTrackInfo(long, Base.ResultCallback<Sooloos.Broker.Api.ExtendedTrackInfo>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection,
+   * CONFIRMED live: the Core accepts it (probe 2026-07-18). See docs/reflist-audit.md.
+   */
   async getExtendedTrackInfo_3(tracks: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetExtendedTrackInfo(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.ExtendedTrackInfo>>)", Buffer.concat(parts));
   }
@@ -4156,9 +4309,13 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetExtendedTrackInfo(long, Sooloos.Broker.Api.ExtendedTrackInfoIntent, Base.ResultCallback<Sooloos.Broker.Api.ExtendedTrackInfo>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection,
+   * CONFIRMED live: the Core accepts it (probe 2026-07-18). See docs/reflist-audit.md.
+   */
   async getExtendedTrackInfo_7(tracks: (bigint | number)[], intent: number): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(intent ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetExtendedTrackInfo(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Sooloos.Broker.Api.ExtendedTrackInfoIntent, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.ExtendedTrackInfo>>)", Buffer.concat(parts));
@@ -4197,17 +4354,27 @@ export class LibraryApi extends ServiceBase {
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Library::AddToLibrary(Sooloos.Broker.Api.Profile, long)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `track` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   addToLibrary_10(profile: bigint, track: (bigint | number)[]): void {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(profile)]),
-      buildArgs([Arg.refList(track)]),
+      buildArgs([Arg.collection((track).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Library::AddToLibrary(Sooloos.Broker.Api.Profile, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `album` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   addToLibrary_11(profile: bigint, album: (bigint | number)[]): void {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(profile)]),
-      buildArgs([Arg.refList(album)]),
+      buildArgs([Arg.collection((album).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Library::AddToLibrary(Sooloos.Broker.Api.Profile, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>)", Buffer.concat(parts));
   }
@@ -4218,15 +4385,25 @@ export class LibraryApi extends ServiceBase {
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Library::AddToLibrary(Sooloos.Broker.Api.Profile, System.Collections.Generic.IEnumerable<long>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `plays` (HistoryPlayBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   deleteHistory(plays: (bigint | number)[]): void {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(plays)]),
+      buildArgs([Arg.collection((plays).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Library::DeleteHistory(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.HistoryPlayBase>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `plays` (HistoryPlay) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   deleteHistory_2(plays: (bigint | number)[]): void {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(plays)]),
+      buildArgs([Arg.collection((plays).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Library::DeleteHistory(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.HistoryPlay>)", Buffer.concat(parts));
   }
@@ -4242,9 +4419,14 @@ export class LibraryApi extends ServiceBase {
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Library::DeleteHistory()", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `plays` (HistoryPlayBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async moveHistory(plays: (bigint | number)[], profile: bigint): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(plays)]),
+      buildArgs([Arg.collection((plays).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.ref(profile)]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::MoveHistory(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.HistoryPlayBase>, Sooloos.Broker.Api.Profile, Base.ResultCallback)", Buffer.concat(parts));
@@ -4285,21 +4467,36 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::DumpToExcel2(Sooloos.Broker.Api.DumpToExcelSpec, Base.ResultCallback<Sooloos.Broker.Api.DumpToExcelResult>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async dumpTracksSoundiiz(tracks: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::DumpTracksSoundiiz(System.Collections.Generic.IList<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback<Sooloos.Broker.Api.DumpToExcelResult>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async dumpAlbumsSoundiiz(albums: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::DumpAlbumsSoundiiz(System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback<Sooloos.Broker.Api.DumpToExcelResult>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performers` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async dumpPerformersSoundiiz(performers: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(performers)]),
+      buildArgs([Arg.collection((performers).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::DumpPerformersSoundiiz(System.Collections.Generic.IList<Sooloos.Broker.Api.PerformerBase>, Base.ResultCallback<Sooloos.Broker.Api.DumpToExcelResult>)", Buffer.concat(parts));
   }
@@ -4327,39 +4524,65 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetTrackExportInfo(System.Collections.Generic.IEnumerable<long>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackExportInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection,
+   * CONFIRMED live: the Core accepts it (probe 2026-07-18). See docs/reflist-audit.md.
+   */
   async getTrackExportInfoForAlbums(albums: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetTrackExportInfoForAlbums(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackExportInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection,
+   * CONFIRMED live: the Core accepts it (probe 2026-07-18). See docs/reflist-audit.md.
+   */
   async getTrackExportInfoForTracks(tracks: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetTrackExportInfoForTracks(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackExportInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `works` (WorkBase) — length-prefixed bare-ref collection,
+   * CONFIRMED live: the Core accepts it (probe 2026-07-18). See docs/reflist-audit.md.
+   */
   async getTrackExportInfoForWorks(works: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(works)]),
+      buildArgs([Arg.collection((works).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetTrackExportInfoForWorks(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.WorkBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackExportInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performances` (PerformanceBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getTrackExportInfoForPerformances(performances: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(performances)]),
+      buildArgs([Arg.collection((performances).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetTrackExportInfoForPerformances(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformanceBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackExportInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `composers` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getTrackExportInfoForComposers(composers: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(composers)]),
+      buildArgs([Arg.collection((composers).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetTrackExportInfoForComposers(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackExportInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performers` (PerformerBase) — length-prefixed bare-ref collection,
+   * CONFIRMED live: the Core accepts it (probe 2026-07-18). See docs/reflist-audit.md.
+   */
   async getTrackExportInfoForPerformers(performers: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(performers)]),
+      buildArgs([Arg.collection((performers).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetTrackExportInfoForPerformers(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackExportInfo>>)", Buffer.concat(parts));
   }
@@ -4417,34 +4640,53 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::FavoriteOrBan(System.Sooid, Sooloos.Broker.Api.WorkBase, Sooloos.Broker.Api.FavoriteBanState, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `track` (TrackBase) — length-prefixed bare-ref collection,
+   * CONFIRMED byte-for-byte against the official client (capture 2026-07-17).
+   */
   async favoriteOrBan_5(profileid: Uint8Array, track: (bigint | number)[], state: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
-      buildArgs([Arg.refList(track)]),
+      buildArgs([Arg.collection((track).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(state ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::FavoriteOrBan(System.Sooid, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Sooloos.Broker.Api.FavoriteBanState, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `album` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async favoriteOrBan_6(profileid: Uint8Array, album: (bigint | number)[], state: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
-      buildArgs([Arg.refList(album)]),
+      buildArgs([Arg.collection((album).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(state ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::FavoriteOrBan(System.Sooid, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Sooloos.Broker.Api.FavoriteBanState, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performer` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async favoriteOrBan_7(profileid: Uint8Array, performer: (bigint | number)[], state: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
-      buildArgs([Arg.refList(performer)]),
+      buildArgs([Arg.collection((performer).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(state ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::FavoriteOrBan(System.Sooid, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Sooloos.Broker.Api.FavoriteBanState, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `work` (WorkBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async favoriteOrBan_8(profileid: Uint8Array, work: (bigint | number)[], state: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
-      buildArgs([Arg.refList(work)]),
+      buildArgs([Arg.collection((work).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(state ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::FavoriteOrBan(System.Sooid, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.WorkBase>, Sooloos.Broker.Api.FavoriteBanState, Base.ResultCallback)", Buffer.concat(parts));
@@ -4473,26 +4715,41 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::SetListenLaterState(System.Sooid, Sooloos.Broker.Api.PerformerBase, Sooloos.Broker.Api.ListenLaterState, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `track` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async setListenLaterState_4(profileid: Uint8Array, track: (bigint | number)[], state: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
-      buildArgs([Arg.refList(track)]),
+      buildArgs([Arg.collection((track).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(state ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::SetListenLaterState(System.Sooid, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Sooloos.Broker.Api.ListenLaterState, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `album` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async setListenLaterState_5(profileid: Uint8Array, album: (bigint | number)[], state: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
-      buildArgs([Arg.refList(album)]),
+      buildArgs([Arg.collection((album).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(state ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::SetListenLaterState(System.Sooid, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Sooloos.Broker.Api.ListenLaterState, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performer` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async setListenLaterState_6(profileid: Uint8Array, performer: (bigint | number)[], state: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
-      buildArgs([Arg.refList(performer)]),
+      buildArgs([Arg.collection((performer).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(state ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::SetListenLaterState(System.Sooid, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Sooloos.Broker.Api.ListenLaterState, Base.ResultCallback)", Buffer.concat(parts));
@@ -4544,9 +4801,13 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetPersistentAlbumId(Sooloos.Broker.Api.AlbumBase, Base.ResultCallback<Sooloos.Broker.Api.PersistentAlbumId>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection,
+   * CONFIRMED live: the Core accepts it (probe 2026-07-18). See docs/reflist-audit.md.
+   */
   async getPersistentAlbumIds(albums: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetPersistentAlbumIds(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PersistentAlbumId>>)", Buffer.concat(parts));
   }
@@ -4556,9 +4817,13 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetPersistentTrackId(Sooloos.Broker.Api.TrackBase, Base.ResultCallback<Sooloos.Broker.Api.PersistentTrackId>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection,
+   * CONFIRMED live: the Core accepts it (probe 2026-07-18). See docs/reflist-audit.md.
+   */
   async getPersistentTrackIds(tracks: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetPersistentTrackIds(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PersistentTrackId>>)", Buffer.concat(parts));
   }
@@ -4568,9 +4833,13 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetPersistentPerformerId(Sooloos.Broker.Api.PerformerBase, Base.ResultCallback<Sooloos.Broker.Api.PersistentPerformerId>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performers` (PerformerBase) — length-prefixed bare-ref collection,
+   * CONFIRMED live: the Core accepts it (probe 2026-07-18). See docs/reflist-audit.md.
+   */
   async getPersistentPerformerIds(performers: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(performers)]),
+      buildArgs([Arg.collection((performers).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetPersistentPerformerIds(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PersistentPerformerId>>)", Buffer.concat(parts));
   }
@@ -4580,9 +4849,13 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetPersistentWorkId(Sooloos.Broker.Api.WorkBase, Base.ResultCallback<Sooloos.Broker.Api.PersistentWorkId>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `works` (WorkBase) — length-prefixed bare-ref collection,
+   * CONFIRMED live: the Core accepts it (probe 2026-07-18). See docs/reflist-audit.md.
+   */
   async getPersistentWorkIds(works: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(works)]),
+      buildArgs([Arg.collection((works).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetPersistentWorkIds(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.WorkBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PersistentWorkId>>)", Buffer.concat(parts));
   }
@@ -4592,9 +4865,14 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetPersistentPerformanceId(Sooloos.Broker.Api.PerformanceBase, Base.ResultCallback<Sooloos.Broker.Api.PersistentPerformanceId>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performances` (PerformanceBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getPersistentPerformanceIds(performances: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(performances)]),
+      buildArgs([Arg.collection((performances).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetPersistentPerformanceIds(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformanceBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PersistentPerformanceId>>)", Buffer.concat(parts));
   }
@@ -4676,9 +4954,13 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetPerformanceLites(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PersistentPerformanceId>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PerformanceLite>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection,
+   * CONFIRMED live: the Core accepts it (probe 2026-07-18). See docs/reflist-audit.md.
+   */
   async getAlternateAlbumVersions(albums: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetAlternateAlbumVersions(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.AlternateAlbumVersion>>)", Buffer.concat(parts));
   }
@@ -4689,39 +4971,69 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::FileSearch(Sooloos.Broker.Api.FileSearchParameters, int, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.FileSearchResult>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async reIdentify(albums: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::ReIdentify(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async reIdentify_2(tracks: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::ReIdentify(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async reAnalyze(albums: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::ReAnalyze(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async reAnalyze_2(tracks: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::ReAnalyze(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async reScan(albums: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::ReScan(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async reScan_2(tracks: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::ReScan(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback)", Buffer.concat(parts));
   }
@@ -4799,9 +5111,14 @@ export class LibraryApi extends ServiceBase {
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Library::NotifyLongNav(System.Sooid, string, System.Sooid)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async reportJunkContent(albums: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::ReportJunkContent(System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback)", Buffer.concat(parts));
   }
@@ -4901,10 +5218,15 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::FavoriteOrBan(System.Sooid, Sooloos.Broker.Api.Folder, Sooloos.Broker.Api.FavoriteBanState, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `folders` (Folder) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async favoriteOrBan_10(profileid: Uint8Array, folders: (bigint | number)[], state: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
-      buildArgs([Arg.refList(folders)]),
+      buildArgs([Arg.collection((folders).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(state ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::FavoriteOrBan(System.Sooid, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.Folder>, Sooloos.Broker.Api.FavoriteBanState, Base.ResultCallback)", Buffer.concat(parts));
@@ -5423,9 +5745,14 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::DeleteTag(Sooloos.Broker.Api.TagBase, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tags` (TagBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async deleteTags(tags: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tags)]),
+      buildArgs([Arg.collection((tags).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::DeleteTags(System.Collections.Generic.IList<Sooloos.Broker.Api.TagBase>, Base.ResultCallback)", Buffer.concat(parts));
   }
@@ -5495,9 +5822,14 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetTrackEditInfo(Sooloos.Broker.Api.AlbumBase, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackEditInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albumids` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getAlbumEditInfo_2(albumids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albumids)]),
+      buildArgs([Arg.collection((albumids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetAlbumEditInfo(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumEditInfo>>)", Buffer.concat(parts));
   }
@@ -5507,27 +5839,47 @@ export class LibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetMultiAlbumEditInfo(Sooloos.Broker.Api.AlbumEditInfoParameters, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumEditInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `trackids` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getTrackEditInfo_3(trackids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(trackids)]),
+      buildArgs([Arg.collection((trackids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetTrackEditInfo(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackEditInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `workids` (WorkBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getWorkEditInfo_2(workids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(workids)]),
+      buildArgs([Arg.collection((workids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetWorkEditInfo(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.WorkBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.WorkEditInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performanceids` (PerformanceBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getPerformanceEditInfo_2(performanceids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(performanceids)]),
+      buildArgs([Arg.collection((performanceids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetPerformanceEditInfo(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformanceBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PerformanceEditInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performerids` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getPerformerEditInfo_2(performerids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(performerids)]),
+      buildArgs([Arg.collection((performerids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Library::GetPerformerEditInfo(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PerformerEditInfo>>)", Buffer.concat(parts));
   }
@@ -6020,15 +6372,25 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.LocalLibrary::AddToLibrary(long)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `track` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   addToLibrary_4(track: (bigint | number)[]): void {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(track)]),
+      buildArgs([Arg.collection((track).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.LocalLibrary::AddToLibrary(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `album` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   addToLibrary_5(album: (bigint | number)[]): void {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(album)]),
+      buildArgs([Arg.collection((album).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.LocalLibrary::AddToLibrary(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>)", Buffer.concat(parts));
   }
@@ -6182,9 +6544,14 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetAlbumLites(System.Collections.Generic.IEnumerable<long>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumLite>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albumids` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getAlbumLites_2(albumids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albumids)]),
+      buildArgs([Arg.collection((albumids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetAlbumLites(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumLite>>)", Buffer.concat(parts));
   }
@@ -6212,9 +6579,14 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetTrackLites(System.Collections.Generic.IEnumerable<long>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackLite>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `trackids` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getTrackLites_2(trackids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(trackids)]),
+      buildArgs([Arg.collection((trackids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetTrackLites(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackLite>>)", Buffer.concat(parts));
   }
@@ -6242,9 +6614,14 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetPerformerLites(System.Collections.Generic.IEnumerable<long>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PerformerLite>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performerids` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getPerformerLites_2(performerids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(performerids)]),
+      buildArgs([Arg.collection((performerids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetPerformerLites(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PerformerLite>>)", Buffer.concat(parts));
   }
@@ -6266,9 +6643,14 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetWorkLites(System.Collections.Generic.IEnumerable<long>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.WorkLite>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `workids` (WorkBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getWorkLites_2(workids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(workids)]),
+      buildArgs([Arg.collection((workids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetWorkLites(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.WorkBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.WorkLite>>)", Buffer.concat(parts));
   }
@@ -6320,9 +6702,14 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetExtendedTrackInfo(long, Base.ResultCallback<Sooloos.Broker.Api.ExtendedTrackInfo>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getExtendedTrackInfo_3(tracks: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetExtendedTrackInfo(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.ExtendedTrackInfo>>)", Buffer.concat(parts));
   }
@@ -6346,9 +6733,14 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetExtendedTrackInfo(long, Sooloos.Broker.Api.ExtendedTrackInfoIntent, Base.ResultCallback<Sooloos.Broker.Api.ExtendedTrackInfo>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getExtendedTrackInfo_7(tracks: (bigint | number)[], intent: number): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(intent ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetExtendedTrackInfo(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Sooloos.Broker.Api.ExtendedTrackInfoIntent, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.ExtendedTrackInfo>>)", Buffer.concat(parts));
@@ -6387,17 +6779,27 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.LocalLibrary::AddToLibrary(Sooloos.Broker.Api.Profile, long)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `track` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   addToLibrary_10(profile: bigint, track: (bigint | number)[]): void {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(profile)]),
-      buildArgs([Arg.refList(track)]),
+      buildArgs([Arg.collection((track).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.LocalLibrary::AddToLibrary(Sooloos.Broker.Api.Profile, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `album` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   addToLibrary_11(profile: bigint, album: (bigint | number)[]): void {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(profile)]),
-      buildArgs([Arg.refList(album)]),
+      buildArgs([Arg.collection((album).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.LocalLibrary::AddToLibrary(Sooloos.Broker.Api.Profile, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>)", Buffer.concat(parts));
   }
@@ -6408,15 +6810,25 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.LocalLibrary::AddToLibrary(Sooloos.Broker.Api.Profile, System.Collections.Generic.IEnumerable<long>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `plays` (HistoryPlayBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   deleteHistory(plays: (bigint | number)[]): void {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(plays)]),
+      buildArgs([Arg.collection((plays).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.LocalLibrary::DeleteHistory(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.HistoryPlayBase>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `plays` (HistoryPlay) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   deleteHistory_2(plays: (bigint | number)[]): void {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(plays)]),
+      buildArgs([Arg.collection((plays).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.LocalLibrary::DeleteHistory(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.HistoryPlay>)", Buffer.concat(parts));
   }
@@ -6432,9 +6844,14 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.LocalLibrary::DeleteHistory()", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `plays` (HistoryPlayBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async moveHistory(plays: (bigint | number)[], profile: bigint): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(plays)]),
+      buildArgs([Arg.collection((plays).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.ref(profile)]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::MoveHistory(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.HistoryPlayBase>, Sooloos.Broker.Api.Profile, Base.ResultCallback)", Buffer.concat(parts));
@@ -6475,21 +6892,36 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::DumpToExcel2(Sooloos.Broker.Api.DumpToExcelSpec, Base.ResultCallback<Sooloos.Broker.Api.DumpToExcelResult>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async dumpTracksSoundiiz(tracks: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::DumpTracksSoundiiz(System.Collections.Generic.IList<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback<Sooloos.Broker.Api.DumpToExcelResult>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async dumpAlbumsSoundiiz(albums: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::DumpAlbumsSoundiiz(System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback<Sooloos.Broker.Api.DumpToExcelResult>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performers` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async dumpPerformersSoundiiz(performers: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(performers)]),
+      buildArgs([Arg.collection((performers).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::DumpPerformersSoundiiz(System.Collections.Generic.IList<Sooloos.Broker.Api.PerformerBase>, Base.ResultCallback<Sooloos.Broker.Api.DumpToExcelResult>)", Buffer.concat(parts));
   }
@@ -6517,39 +6949,69 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetTrackExportInfo(System.Collections.Generic.IEnumerable<long>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackExportInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getTrackExportInfoForAlbums(albums: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetTrackExportInfoForAlbums(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackExportInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getTrackExportInfoForTracks(tracks: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetTrackExportInfoForTracks(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackExportInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `works` (WorkBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getTrackExportInfoForWorks(works: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(works)]),
+      buildArgs([Arg.collection((works).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetTrackExportInfoForWorks(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.WorkBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackExportInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performances` (PerformanceBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getTrackExportInfoForPerformances(performances: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(performances)]),
+      buildArgs([Arg.collection((performances).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetTrackExportInfoForPerformances(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformanceBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackExportInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `composers` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getTrackExportInfoForComposers(composers: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(composers)]),
+      buildArgs([Arg.collection((composers).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetTrackExportInfoForComposers(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackExportInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performers` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getTrackExportInfoForPerformers(performers: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(performers)]),
+      buildArgs([Arg.collection((performers).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetTrackExportInfoForPerformers(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackExportInfo>>)", Buffer.concat(parts));
   }
@@ -6607,34 +7069,54 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::FavoriteOrBan(System.Sooid, Sooloos.Broker.Api.WorkBase, Sooloos.Broker.Api.FavoriteBanState, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `track` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async favoriteOrBan_5(profileid: Uint8Array, track: (bigint | number)[], state: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
-      buildArgs([Arg.refList(track)]),
+      buildArgs([Arg.collection((track).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(state ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::FavoriteOrBan(System.Sooid, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Sooloos.Broker.Api.FavoriteBanState, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `album` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async favoriteOrBan_6(profileid: Uint8Array, album: (bigint | number)[], state: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
-      buildArgs([Arg.refList(album)]),
+      buildArgs([Arg.collection((album).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(state ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::FavoriteOrBan(System.Sooid, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Sooloos.Broker.Api.FavoriteBanState, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performer` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async favoriteOrBan_7(profileid: Uint8Array, performer: (bigint | number)[], state: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
-      buildArgs([Arg.refList(performer)]),
+      buildArgs([Arg.collection((performer).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(state ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::FavoriteOrBan(System.Sooid, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Sooloos.Broker.Api.FavoriteBanState, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `work` (WorkBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async favoriteOrBan_8(profileid: Uint8Array, work: (bigint | number)[], state: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
-      buildArgs([Arg.refList(work)]),
+      buildArgs([Arg.collection((work).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(state ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::FavoriteOrBan(System.Sooid, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.WorkBase>, Sooloos.Broker.Api.FavoriteBanState, Base.ResultCallback)", Buffer.concat(parts));
@@ -6663,26 +7145,41 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::SetListenLaterState(System.Sooid, Sooloos.Broker.Api.PerformerBase, Sooloos.Broker.Api.ListenLaterState, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `track` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async setListenLaterState_4(profileid: Uint8Array, track: (bigint | number)[], state: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
-      buildArgs([Arg.refList(track)]),
+      buildArgs([Arg.collection((track).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(state ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::SetListenLaterState(System.Sooid, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Sooloos.Broker.Api.ListenLaterState, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `album` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async setListenLaterState_5(profileid: Uint8Array, album: (bigint | number)[], state: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
-      buildArgs([Arg.refList(album)]),
+      buildArgs([Arg.collection((album).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(state ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::SetListenLaterState(System.Sooid, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Sooloos.Broker.Api.ListenLaterState, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performer` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async setListenLaterState_6(profileid: Uint8Array, performer: (bigint | number)[], state: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
-      buildArgs([Arg.refList(performer)]),
+      buildArgs([Arg.collection((performer).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(state ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::SetListenLaterState(System.Sooid, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Sooloos.Broker.Api.ListenLaterState, Base.ResultCallback)", Buffer.concat(parts));
@@ -6734,9 +7231,14 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetPersistentAlbumId(Sooloos.Broker.Api.AlbumBase, Base.ResultCallback<Sooloos.Broker.Api.PersistentAlbumId>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getPersistentAlbumIds(albums: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetPersistentAlbumIds(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PersistentAlbumId>>)", Buffer.concat(parts));
   }
@@ -6746,9 +7248,14 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetPersistentTrackId(Sooloos.Broker.Api.TrackBase, Base.ResultCallback<Sooloos.Broker.Api.PersistentTrackId>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getPersistentTrackIds(tracks: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetPersistentTrackIds(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PersistentTrackId>>)", Buffer.concat(parts));
   }
@@ -6758,9 +7265,14 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetPersistentPerformerId(Sooloos.Broker.Api.PerformerBase, Base.ResultCallback<Sooloos.Broker.Api.PersistentPerformerId>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performers` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getPersistentPerformerIds(performers: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(performers)]),
+      buildArgs([Arg.collection((performers).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetPersistentPerformerIds(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PersistentPerformerId>>)", Buffer.concat(parts));
   }
@@ -6770,9 +7282,14 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetPersistentWorkId(Sooloos.Broker.Api.WorkBase, Base.ResultCallback<Sooloos.Broker.Api.PersistentWorkId>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `works` (WorkBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getPersistentWorkIds(works: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(works)]),
+      buildArgs([Arg.collection((works).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetPersistentWorkIds(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.WorkBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PersistentWorkId>>)", Buffer.concat(parts));
   }
@@ -6782,9 +7299,14 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetPersistentPerformanceId(Sooloos.Broker.Api.PerformanceBase, Base.ResultCallback<Sooloos.Broker.Api.PersistentPerformanceId>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performances` (PerformanceBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getPersistentPerformanceIds(performances: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(performances)]),
+      buildArgs([Arg.collection((performances).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetPersistentPerformanceIds(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformanceBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PersistentPerformanceId>>)", Buffer.concat(parts));
   }
@@ -6866,9 +7388,14 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetPerformanceLites(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PersistentPerformanceId>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PerformanceLite>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getAlternateAlbumVersions(albums: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetAlternateAlbumVersions(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.AlternateAlbumVersion>>)", Buffer.concat(parts));
   }
@@ -6879,39 +7406,69 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::FileSearch(Sooloos.Broker.Api.FileSearchParameters, int, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.FileSearchResult>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async reIdentify(albums: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::ReIdentify(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async reIdentify_2(tracks: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::ReIdentify(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async reAnalyze(albums: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::ReAnalyze(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async reAnalyze_2(tracks: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::ReAnalyze(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async reScan(albums: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::ReScan(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async reScan_2(tracks: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::ReScan(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback)", Buffer.concat(parts));
   }
@@ -6989,9 +7546,14 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.LocalLibrary::NotifyLongNav(System.Sooid, string, System.Sooid)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async reportJunkContent(albums: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::ReportJunkContent(System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback)", Buffer.concat(parts));
   }
@@ -7091,10 +7653,15 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::FavoriteOrBan(System.Sooid, Sooloos.Broker.Api.Folder, Sooloos.Broker.Api.FavoriteBanState, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `folders` (Folder) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async favoriteOrBan_10(profileid: Uint8Array, folders: (bigint | number)[], state: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.sooid(profileid ?? Buffer.alloc(0))]),
-      buildArgs([Arg.refList(folders)]),
+      buildArgs([Arg.collection((folders).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(state ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::FavoriteOrBan(System.Sooid, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.Folder>, Sooloos.Broker.Api.FavoriteBanState, Base.ResultCallback)", Buffer.concat(parts));
@@ -7613,9 +8180,14 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::DeleteTag(Sooloos.Broker.Api.TagBase, Base.ResultCallback)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tags` (TagBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async deleteTags(tags: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(tags)]),
+      buildArgs([Arg.collection((tags).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::DeleteTags(System.Collections.Generic.IList<Sooloos.Broker.Api.TagBase>, Base.ResultCallback)", Buffer.concat(parts));
   }
@@ -7685,9 +8257,14 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetTrackEditInfo(Sooloos.Broker.Api.AlbumBase, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackEditInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albumids` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getAlbumEditInfo_2(albumids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(albumids)]),
+      buildArgs([Arg.collection((albumids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetAlbumEditInfo(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumEditInfo>>)", Buffer.concat(parts));
   }
@@ -7697,27 +8274,47 @@ export class LocalLibraryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetMultiAlbumEditInfo(Sooloos.Broker.Api.AlbumEditInfoParameters, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumEditInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `trackids` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getTrackEditInfo_3(trackids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(trackids)]),
+      buildArgs([Arg.collection((trackids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetTrackEditInfo(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.TrackEditInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `workids` (WorkBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getWorkEditInfo_2(workids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(workids)]),
+      buildArgs([Arg.collection((workids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetWorkEditInfo(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.WorkBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.WorkEditInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performanceids` (PerformanceBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getPerformanceEditInfo_2(performanceids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(performanceids)]),
+      buildArgs([Arg.collection((performanceids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetPerformanceEditInfo(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformanceBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PerformanceEditInfo>>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performerids` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async getPerformerEditInfo_2(performerids: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(performerids)]),
+      buildArgs([Arg.collection((performerids).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.LocalLibrary::GetPerformerEditInfo(System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.PerformerEditInfo>>)", Buffer.concat(parts));
   }
@@ -8433,10 +9030,15 @@ export class PlaylistsApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Playlists::CreatePlaylistFromPlaylist(Sooloos.Broker.Api.Profile, string, string, bool, Sooloos.Broker.Api.Playlist, Base.ResultCallback<Sooloos.Broker.Api.Playlist>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `items` (PlaylistItem) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   removeItems(playlist: bigint, items: (bigint | number)[]): void {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(playlist)]),
-      buildArgs([Arg.refList(items)]),
+      buildArgs([Arg.collection((items).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Playlists::RemoveItems(Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PlaylistItem>)", Buffer.concat(parts));
   }
@@ -8458,128 +9060,198 @@ export class PlaylistsApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Playlists::InsertMedia(Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<long>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem, Base.ResultCallback<Sooloos.Broker.Api.PlaylistInsertionResult>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   insertAlbums(playlist: bigint, albums: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): void {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(playlist)]),
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Playlists::InsertAlbums(Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `albums` (AlbumBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async insertAlbums_2(playlist: bigint, albums: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(playlist)]),
-      buildArgs([Arg.refList(albums)]),
+      buildArgs([Arg.collection((albums).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Playlists::InsertAlbums(Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.AlbumBase>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem, Base.ResultCallback<Sooloos.Broker.Api.PlaylistInsertionResult>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   insertTracks(playlist: bigint, tracks: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): void {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(playlist)]),
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Playlists::InsertTracks(Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `tracks` (TrackBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async insertTracks_2(playlist: bigint, tracks: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(playlist)]),
-      buildArgs([Arg.refList(tracks)]),
+      buildArgs([Arg.collection((tracks).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Playlists::InsertTracks(Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.TrackBase>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem, Base.ResultCallback<Sooloos.Broker.Api.PlaylistInsertionResult>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `works` (WorkBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   insertWorks(playlist: bigint, works: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): void {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(playlist)]),
-      buildArgs([Arg.refList(works)]),
+      buildArgs([Arg.collection((works).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Playlists::InsertWorks(Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.WorkBase>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `works` (WorkBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async insertWorks_2(playlist: bigint, works: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(playlist)]),
-      buildArgs([Arg.refList(works)]),
+      buildArgs([Arg.collection((works).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Playlists::InsertWorks(Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.WorkBase>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem, Base.ResultCallback<Sooloos.Broker.Api.PlaylistInsertionResult>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performances` (PerformanceBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   insertPerformances(playlist: bigint, performances: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): void {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(playlist)]),
-      buildArgs([Arg.refList(performances)]),
+      buildArgs([Arg.collection((performances).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Playlists::InsertPerformances(Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformanceBase>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performances` (PerformanceBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async insertPerformances_2(playlist: bigint, performances: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(playlist)]),
-      buildArgs([Arg.refList(performances)]),
+      buildArgs([Arg.collection((performances).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Playlists::InsertPerformances(Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformanceBase>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem, Base.ResultCallback<Sooloos.Broker.Api.PlaylistInsertionResult>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performers` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   insertPerformers(playlist: bigint, performers: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): void {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(playlist)]),
-      buildArgs([Arg.refList(performers)]),
+      buildArgs([Arg.collection((performers).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Playlists::InsertPerformers(Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `performers` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async insertPerformers_2(playlist: bigint, performers: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(playlist)]),
-      buildArgs([Arg.refList(performers)]),
+      buildArgs([Arg.collection((performers).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Playlists::InsertPerformers(Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem, Base.ResultCallback<Sooloos.Broker.Api.PlaylistInsertionResult>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `composers` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   insertComposers(playlist: bigint, composers: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): void {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(playlist)]),
-      buildArgs([Arg.refList(composers)]),
+      buildArgs([Arg.collection((composers).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Playlists::InsertComposers(Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `composers` (PerformerBase) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async insertComposers_2(playlist: bigint, composers: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(playlist)]),
-      buildArgs([Arg.refList(composers)]),
+      buildArgs([Arg.collection((composers).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Playlists::InsertComposers(Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PerformerBase>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem, Base.ResultCallback<Sooloos.Broker.Api.PlaylistInsertionResult>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `playlists` (Playlist) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   insertPlaylists(playlist: bigint, playlists: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): void {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(playlist)]),
-      buildArgs([Arg.refList(playlists)]),
+      buildArgs([Arg.collection((playlists).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Playlists::InsertPlaylists(Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.Playlist>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `playlists` (Playlist) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async insertPlaylists_2(profile: bigint, playlist: bigint, playlists: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(profile)]),
       buildArgs([Arg.ref(playlist)]),
-      buildArgs([Arg.refList(playlists)]),
+      buildArgs([Arg.collection((playlists).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
@@ -8598,40 +9270,60 @@ export class PlaylistsApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Playlists::InsertMediaUnified(Sooloos.Broker.Api.Playlist, Sooloos.Broker.Api.PlaylistInsertionParameters, Base.ResultCallback<Sooloos.Broker.Api.PlaylistInsertionResult>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `items` (PlaylistItem) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   moveItemsFromPlaylist(from_playlist: bigint, to_playlist: bigint, items: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): void {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(from_playlist)]),
       buildArgs([Arg.ref(to_playlist)]),
-      buildArgs([Arg.refList(items)]),
+      buildArgs([Arg.collection((items).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Playlists::MoveItemsFromPlaylist(Sooloos.Broker.Api.Playlist, Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PlaylistItem>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `items` (PlaylistItem) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   copyItemsFromPlaylist(from_playlist: bigint, to_playlist: bigint, items: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): void {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(from_playlist)]),
       buildArgs([Arg.ref(to_playlist)]),
-      buildArgs([Arg.refList(items)]),
+      buildArgs([Arg.collection((items).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
     this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.Playlists::CopyItemsFromPlaylist(Sooloos.Broker.Api.Playlist, Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PlaylistItem>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `items` (PlaylistItem) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async copyItemsFromPlaylist_2(from_playlist: bigint, to_playlist: bigint, items: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(from_playlist)]),
       buildArgs([Arg.ref(to_playlist)]),
-      buildArgs([Arg.refList(items)]),
+      buildArgs([Arg.collection((items).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.Playlists::CopyItemsFromPlaylist(Sooloos.Broker.Api.Playlist, Sooloos.Broker.Api.Playlist, System.Collections.Generic.IEnumerable<Sooloos.Broker.Api.PlaylistItem>, Sooloos.Broker.Api.InsertionPoint, Sooloos.Broker.Api.PlaylistItem, Base.ResultCallback<Sooloos.Broker.Api.PlaylistInsertionResult>)", Buffer.concat(parts));
   }
+  /**
+   * reflist-audit: `items` (PlaylistItem) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async moveItems(playlist: bigint, items: (bigint | number)[], insertionpoint: number, relative_to_item: bigint): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.ref(playlist)]),
-      buildArgs([Arg.refList(items)]),
+      buildArgs([Arg.collection((items).map((o) => buildArgs([Arg.ref(o)])))]),
       buildArgs([Arg.enum_(Number(insertionpoint ?? 0))]),
       buildArgs([Arg.ref(relative_to_item)]),
     ];
@@ -8815,9 +9507,14 @@ export class PlaylistImproverHelperApi extends ServiceBase {
 }
 
 export class PlaylistImproverApi extends ServiceBase {
+  /**
+   * reflist-audit: `new_items` (ImprovedItem) — length-prefixed bare-ref collection
+   * (the uniform model; this exact site is not individually captured — capture-diff
+   * if it misbehaves, and see docs/reflist-audit.md for the stable-id path).
+   */
   async commitImprovements(new_items: (bigint | number)[]): Promise<CallResult> {
     const parts: Buffer[] = [
-      buildArgs([Arg.refList(new_items)]),
+      buildArgs([Arg.collection((new_items).map((o) => buildArgs([Arg.ref(o)])))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.PlaylistImprover::CommitImprovements(System.Collections.Generic.IList<Sooloos.Broker.Api.ImprovedItem>, Base.ResultCallback)", Buffer.concat(parts));
   }
