@@ -6,7 +6,7 @@
  */
 
 // High-level facade — start here.
-export { RoonClient, RoonClientOptions } from './proto/client';
+export { RoonClient, RoonClientOptions, StructField, AlbumEdits, AlbumEditInfo, EditField } from './proto/client';
 
 // Transport + remoting layer.
 export { RoonConnection, ConnectionOptions } from './proto/connection';

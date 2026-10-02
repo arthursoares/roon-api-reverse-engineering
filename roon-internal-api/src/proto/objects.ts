@@ -234,6 +234,23 @@ export class ObjectGraph {
     return this.readValue(new BinaryReader(payload), PropertyType.Object);
   }
 
+  /**
+   * Methods returning IList<T> (GetRestoreItems, GetTrackEditInfo(AlbumBase), GetSelected, ...) answer
+   * flexInt(len) + [flexInt(count) + one Object-encoded value per item]. decodeReturnValue would read the
+   * leading length as an object reference. Reference items decode to {$ref}; value types to inline structs.
+   */
+  decodeListReturnValue(payload: Uint8Array): unknown[] {
+    const r = new BinaryReader(payload);
+    const len = r.flexInt();
+    if (len !== r.remaining) throw new Error(`list length ${len} != remaining ${r.remaining} bytes`);
+    const body = new BinaryReader(r.bytes(len));
+    const count = body.flexInt();
+    const items: unknown[] = [];
+    for (let i = 0; i < count; i++) items.push(this.readValue(body, PropertyType.Object));
+    if (body.remaining !== 0) throw new Error(`${body.remaining} bytes left after decoding ${count} list items`);
+    return items;
+  }
+
   // --- queries ---
 
   /** All objects whose type name equals or ends with the given short name. */

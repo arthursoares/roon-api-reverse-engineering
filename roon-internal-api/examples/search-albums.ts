@@ -1,5 +1,5 @@
 /**
- * Phase D: searchAlbums returns real album results (READ-ONLY).
+ * searchAlbums returns real album results via queryAlbums (READ-ONLY).
  *   npx ts-node examples/search-albums.ts Clube
  *
  * Returns library albums whose title matches the term (harvested from the live

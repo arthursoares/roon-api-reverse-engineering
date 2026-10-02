@@ -1,4 +1,4 @@
-import { RoonClient } from './client';
+import { RoonClient, parseAlbumEditInfo } from './client';
 import { RemotingClient, Cmd, Transport } from './remoting';
 import { FrameParser, encodeResponse } from './frame';
 import { BinaryWriter } from './writer';
@@ -550,4 +550,80 @@ test('unknown types allow an immutable explicit schema and fail incompatible reu
   expect(c.structArg('Vendor.Unknown', [field])).toEqual(first);
   expect(() => c.structArg('Vendor.Unknown', [])).toThrow(/incompatible schema/);
   expect(declaredTypes(t).size).toBe(1);
+});
+
+describe('album queries', () => {
+  test('queryAlbums selects all, resolves albums by AlbumId, then disposes the query', async () => {
+    const { c, t } = buildClient();
+    seedCore(c);
+    const LINK = 'Sooloos.Broker.Api.AlbumLink';
+    c.graph.types.set(900, { id: 900, name: LINK, members: [{ name: `long ${LINK}::AlbumId`, propType: PropertyType.Long }] });
+    seed(c, 500n, 'Sooloos.Broker.Api.VirtualAlbumLiteQuery', { 'int Sooloos.Broker.Api.VirtualAlbumLiteQuery::Count': 2 });
+    seed(c, 601n, 'Sooloos.Broker.Api.Album', { 'string Sooloos.Broker.Api.Album::Title': 'A' });
+
+    const calls = () => t.sentFrames().filter((f) => f.cmd === Cmd.CALL);
+    const reply = async (n: number, payload: Buffer = Buffer.alloc(0)) => {
+      while (calls().length < n) await new Promise((r) => setImmediate(r));
+      t.deliver(encodeResponse(calls()[n - 1].rid!, Buffer.concat([new BinaryWriter().string('').toBuffer(), payload]), true));
+    };
+    const link = (id: number) => {
+      const f = new BinaryWriter().flexInt(1).long(id).flexInt(0).toBuffer();
+      return new BinaryWriter().long(1).integer(900).integer(f.length).bytes(f).toBuffer();
+    };
+    const body = Buffer.concat([new BinaryWriter().flexInt(2).toBuffer(), link(1774792), link(920111)]);
+
+    const pending = c.queryAlbums([], { resolveLimit: 1 });
+    await reply(1, new BinaryWriter().long(500).toBuffer()); // VirtualAlbumQuery -> query object
+    await reply(2); // SelectAll
+    await reply(3, Buffer.concat([new BinaryWriter().flexInt(body.length).toBuffer(), body])); // GetSelected
+    await reply(4, new BinaryWriter().long(601).toBuffer()); // GetAlbum(1774792)
+    const r = await pending;
+
+    expect(r.count).toBe(2);
+    expect(r.ids).toEqual([1774792n, 920111n]);
+    expect(r.albums.map((a) => a.oid)).toEqual([601n]);
+    expect(calls()).toHaveLength(5); // four answered calls + the final no-reply Dispose (no rid)
+    expect(calls()[4].rid).toBeNull();
+    const methods = t.sentFrames().filter((f) => f.cmd !== Cmd.CALL && f.cmd !== Cmd.DEFTYPE).map((f) => f.body.toString('latin1'));
+    expect(methods.some((m) => m.includes('VirtualAlbumLiteQuery::Dispose()'))).toBe(true);
+  });
+});
+
+describe('album edit info', () => {
+  const T = 'Sooloos.Broker.Api.EditRequiredRefInfo<string>';
+  const L = 'Sooloos.Broker.Api.EditListInfo<string>';
+  const stringList = (...xs: string[]) => {
+    const w = new BinaryWriter().flexInt(xs.length);
+    for (const x of xs) w.string(x);
+    return w.toBuffer();
+  };
+
+  test('edited follows EditValue/AddValues, not HasEditLayer', () => {
+    const untouched = parseAlbumEditInfo({
+      [`${T} X::Title`]: { [`string ${T}::Value`]: 'Original Title', [`bool ${T}::HasEditLayer`]: true },
+      [`${L} X::Genres`]: { [`${L}::Values`]: stringList('Pop'), [`bool ${L}::HasEditLayer`]: true },
+    });
+    expect(untouched.title).toMatchObject({ value: 'Original Title', edited: false, hasEditLayer: true });
+    expect(untouched.genres).toMatchObject({ edited: false, hasEditLayer: true });
+
+    const edited = parseAlbumEditInfo({
+      [`${T} X::Title`]: { [`string ${T}::Value`]: 'B', [`string ${T}::EditValue`]: 'B', [`bool ${T}::HasEditLayer`]: true },
+      [`${L} X::Genres`]: { [`${L}::AddValues`]: stringList('Jazz') },
+    });
+    expect(edited.title).toMatchObject({ value: 'B', editValue: 'B', edited: true });
+    expect(edited.genres.edited).toBe(true);
+  });
+
+  test('clearTitle sends Title.ClearEdits instead of an EditValue', async () => {
+    const { c, t } = buildClient();
+    seedCore(c);
+    const pending = c.editAlbum(17n, { clearTitle: true });
+    const decoded = latestAlbumEdit(t);
+    await completeLatestCall(t, pending);
+    expect(decoded.memberName).toContain('::Title');
+    const w = inlineValue(decoded.value);
+    expect(declaredTypes(t).get(w.typeId)!.members[w.body.flexInt() - 1].name).toContain('::ClearEdits');
+    expect(w.body.boolean()).toBe(true);
+    expect(() => c.editAlbum(17n, { title: 'x', clearTitle: true })).toThrow();
+  });
 });

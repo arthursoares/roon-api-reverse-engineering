@@ -66,7 +66,14 @@ await roon.editAlbum(albumId, {
   genres: ['Jazz'],
   labels: ['Columbia'],
 });
+
+// drop the title edit again (sends Title.ClearEdits)
+await roon.editAlbum(albumId, { clearTitle: true });
 ```
+
+In the edit info, `edited` means the user changed that field: `editValue` is set, or for
+lists `AddValues`/`RemoveValues` are non-empty. `hasEditLayer` only says the album has an
+edit layer, which albums nobody touched can have too.
 
 Get the durable `albumId` (distinct from the session oid) with `roon.albumIdOf(album)`.
 `examples/edit-album.ts`, `examples/album-edit-info.ts`.
@@ -88,8 +95,27 @@ repeated queries. The optional third argument retains playlist and genre results
 existing callers keep the four entity families shown above. These reads were checked
 against Roon 2.73 build 1696. Broader streaming-catalog behavior still needs validation.
 
-The older paged `searchAlbums` helper and `examples/search-albums.ts` /
-`examples/poc-search.ts` remain experimental research paths. Historical findings are
+### Album queries
+
+`queryAlbums` runs `Library::VirtualAlbumQuery` with any `AlbumQueryCriteria` members. It
+collects every match's durable `AlbumId` through the query object's `SelectAll` +
+`GetSelected`, fetches the first `resolveLimit` albums (default 40) with `getAlbumById`, and
+disposes the server-side query. `searchAlbums(term, limit)` is a text-filter shortcut on top
+of it.
+
+```ts
+import { BinaryWriter, PropertyType } from 'roon-internal-api';
+
+const { count, ids, albums } = await roon.queryAlbums([
+  { name: 'TextFilter', propType: PropertyType.String, value: new BinaryWriter().string('Kind of Blue').toBuffer() },
+], { resolveLimit: 10 });
+const firstTen = await roon.searchAlbums('Kind of Blue', 10);
+```
+
+Query pages arrive through `Page` events, so reading `$items` after `RetainPage` (what
+`searchAlbums` used to do) stays empty. Checked on Roon 2.73 build 1696 with a favorites
+query (`RequireIsFavorite`), which returned the same 170 albums as the desktop client.
+`examples/poc-search.ts` remains an experimental research path; historical findings are
 preserved in [the journey](/journey/#where-it-stands).
 
 ## The full generated API

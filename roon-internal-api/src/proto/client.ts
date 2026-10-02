@@ -291,67 +291,95 @@ export class RoonClient {
     return this.strField(o, '::Title') ?? this.strField(o, '::Name') ?? '?';
   }
 
+  /** Wait until a referenced object has fields in the graph. Non-references give undefined; on timeout, whatever the graph holds. */
+  async waitObject(ref: unknown, ms = 3000): Promise<RoonObject | undefined> {
+    if (!isRef(ref)) return undefined;
+    const end = Date.now() + ms;
+    for (;;) {
+      const o = this.graph.getObject(ref.$ref);
+      if ((o && Object.keys(o.fields).length) || Date.now() > end) return o;
+      await new Promise((r) => setTimeout(r, 50));
+    }
+  }
+
+  /** Decode the result of a method that returns IList<T>; throws when the call failed. */
+  listResult(res: CallResult): unknown[] {
+    if (!res.success) throw new Error(`call failed: ${res.status}`);
+    return this.graph.decodeListReturnValue(Uint8Array.from(res.payload));
+  }
+
+  /** Fetch an album by its durable AlbumId via Library::GetAlbum(long, GetAlbumMode); mode defaults to Basic (1). */
+  async getAlbumById(albumId: bigint, mode = 1): Promise<RoonObject | undefined> {
+    const res = await this.remoting.callMethod(
+      this.serviceOid('Library'),
+      'Sooloos.Broker.Api.Library::GetAlbum(long, Sooloos.Broker.Api.GetAlbumMode, Base.ResultCallback<Sooloos.Broker.Api.Album>)',
+      buildArgs([Arg.long(albumId), Arg.enum_(mode)]),
+    );
+    if (!res.success) return undefined;
+    return this.waitObject(this.graph.decodeReturnValue(Uint8Array.from(res.payload)));
+  }
+
   /**
-   * Search albums via VirtualAlbumQuery + RetainPage (the paged query path the
-   * official client uses). Returns the AlbumLite objects on the first page.
-   *   VirtualAlbumQuery(profile, criteria{TextFilter}, params{PageSize}) ->
-   *   VirtualAlbumLiteQuery oid -> RetainPage(0) -> items push.
+   * Query albums with Library::VirtualAlbumQuery. Pages arrive through Page events, so reading
+   * `$items` after RetainPage stays empty. Instead, SelectAll + GetSelected on the query object
+   * return every match at once (links that carry the durable AlbumId); the first `resolveLimit`
+   * albums are fetched with getAlbumById, and the server-side query is disposed afterwards.
+   * `criteria` are AlbumQueryCriteria members (short names work); UiLanguage defaults to en.
+   * `resolveLimit` defaults to 40 so an empty criteria list does not fetch the whole library;
+   * pass Infinity to resolve every match.
+   * Verified live on Roon 2.73 build 1696.
    */
-  async searchAlbums(term: string, pageSize = 40): Promise<RoonObject[]> {
-    const criteria = this.structArg('Sooloos.Broker.Api.AlbumQueryCriteria', [
-      { name: 'UiLanguage', propType: PropertyType.String, value: new BinaryWriter().string('en').toBuffer() },
-      { name: 'TextFilter', propType: PropertyType.String, value: new BinaryWriter().string(term).toBuffer() },
+  async queryAlbums(criteria: StructField[], opts: { resolveLimit?: number; pageSize?: number } = {}): Promise<{
+    count: number; ids: (bigint | null)[]; albums: RoonObject[]; missing: number; queryFields: Record<string, unknown>;
+  }> {
+    const crit = this.structArg('Sooloos.Broker.Api.AlbumQueryCriteria', [
+      ...(criteria.some((f) => f.name === 'UiLanguage') ? [] : [
+        { name: 'UiLanguage', propType: PropertyType.String, value: new BinaryWriter().string('en').toBuffer() }]),
+      ...criteria,
     ]);
     const params = this.structArg('Sooloos.Broker.Api.VirtualQueryParameters', [
-      { name: 'PageSize', propType: PropertyType.Int, value: new BinaryWriter().integer(pageSize).toBuffer() },
+      { name: 'PageSize', propType: PropertyType.Int, value: new BinaryWriter().integer(opts.pageSize ?? 500).toBuffer() },
     ]);
-    const args = Buffer.concat([buildArgs([Arg.sooid(this.profile())]), criteria, params]);
-    const res = await this.call(
-      'Library',
-      'VirtualAlbumQuery',
-      [
-        { type: 'Sooid', name: 'profileid' },
-        { type: 'AlbumQueryCriteria', name: 'criteria' },
-        { type: 'VirtualQueryParameters', name: 'queryparams' },
-        { type: 'ResultCallback<VirtualAlbumLiteQuery>', name: 'cb' },
-      ],
-      args,
-      this.serviceOid('Library')
-    );
+    const res = await this.call('Library', 'VirtualAlbumQuery', [
+      { type: 'Sooid', name: 'profileid' },
+      { type: 'AlbumQueryCriteria', name: 'criteria' },
+      { type: 'VirtualQueryParameters', name: 'queryparams' },
+      { type: 'ResultCallback<VirtualAlbumLiteQuery>', name: 'cb' },
+    ], Buffer.concat([buildArgs([Arg.sooid(this.profile())]), crit, params]), this.serviceOid('Library'));
     if (!res.success) throw new Error(`VirtualAlbumQuery failed: ${res.status}`);
-    // payload = object reference to the VirtualAlbumLiteQuery (GetObject: flexlong oid)
-    const [queryOid] = readFlexLong(Uint8Array.from(res.payload), 0);
-    await new Promise((r) => setTimeout(r, 400));
-    // RetainPage(0) loads the first page; items then push.
-    await this.call(
-      'VirtualAlbumLiteQuery',
-      'RetainPage',
-      [
-        { type: 'int', name: 'pagen' },
-        { type: 'ResultCallback', name: 'cb' },
-      ],
-      buildArgs([Arg.int(0)]),
-      queryOid
-    );
-    await new Promise((r) => setTimeout(r, 1500));
-    // Collect AlbumLite objects referenced by the query's page items.
-    const q = this.graph.getObject(queryOid);
-    const items: any[] = (q?.fields as any)?.$items || [];
-    const out: RoonObject[] = [];
-    for (const it of items) {
-      const oid = isRef(it) ? it.$ref : undefined;
-      const o = oid !== undefined ? this.graph.getObject(oid) : undefined;
-      if (o && this.strField(o, '::Title')) out.push(o);
-    }
-    // Fallback: any AlbumLite whose title contains the term (in case items are inline).
-    if (!out.length) {
-      const needle = term.toLowerCase();
-      for (const o of this.graph.findByType('AlbumLite')) {
-        const t = this.strField(o, '::Title');
-        if (t && t.toLowerCase().includes(needle)) out.push(o);
+    const q = this.graph.decodeReturnValue(Uint8Array.from(res.payload));
+    if (!isRef(q)) throw new Error('VirtualAlbumQuery returned no query object');
+    const qid = q.$ref;
+    const sig = (m: string) => `Sooloos.Broker.Api.VirtualAlbumLiteQuery::${m}`;
+    try {
+      await this.waitObject(q);
+      const sel = await this.remoting.callMethod(qid, sig('SelectAll(Base.ResultCallback)'), Buffer.alloc(0));
+      if (!sel.success) throw new Error(`SelectAll failed: ${sel.status}`);
+      const items = this.listResult(await this.remoting.callMethod(qid,
+        sig('GetSelected(Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumBase>>)'), Buffer.alloc(0)));
+      const ids = items.map((it) => {
+        const id = isRef(it) ? undefined : member(it as Record<string, unknown>, '::AlbumId');
+        return id === undefined || id === null ? null : BigInt(String(id));
+      });
+      const albums: RoonObject[] = [];
+      let missing = 0;
+      for (const [i, it] of items.slice(0, opts.resolveLimit ?? 40).entries()) {
+        const o = isRef(it) ? await this.waitObject(it, 1000) : ids[i] !== null ? await this.getAlbumById(ids[i]!) : undefined;
+        if (o && Object.keys(o.fields).length) albums.push(o); else missing++;
       }
+      return { count: items.length, ids, albums, missing, queryFields: { ...(this.graph.getObject(qid)?.fields ?? {}) } };
+    } finally {
+      this.remoting.callMethodNoReply(qid, sig('Dispose()'), Buffer.alloc(0));
     }
-    return out;
+  }
+
+  /** Albums matching a text filter (AlbumQueryCriteria.TextFilter), resolving at most `limit`. Built on queryAlbums. */
+  async searchAlbums(term: string, limit = 40): Promise<RoonObject[]> {
+    const r = await this.queryAlbums(
+      [{ name: 'TextFilter', propType: PropertyType.String, value: new BinaryWriter().string(term).toBuffer() }],
+      { resolveLimit: limit },
+    );
+    return r.albums;
   }
 
   // --- typed convenience methods (proven live) ---
@@ -520,9 +548,11 @@ export class RoonClient {
    */
   editAlbum(albumId: bigint, edits: AlbumEdits): Promise<CallResult> {
     const fields: StructField[] = [];
-    if (edits.title !== undefined) {
-      const w = this.structArg(EDIT_REQUIRED_REF_STR, [
-        { name: `string ${EDIT_REQUIRED_REF_STR}::EditValue`, propType: PropertyType.String, value: new BinaryWriter().string(edits.title).toBuffer() },
+    if (edits.title !== undefined && edits.clearTitle) throw new Error('editAlbum: title and clearTitle are exclusive');
+    if (edits.title !== undefined || edits.clearTitle) {
+      const w = this.structArg(EDIT_REQUIRED_REF_STR, [edits.clearTitle
+        ? { name: `bool ${EDIT_REQUIRED_REF_STR}::ClearEdits`, propType: PropertyType.Bool, value: new BinaryWriter().boolean(true).toBuffer() }
+        : { name: `string ${EDIT_REQUIRED_REF_STR}::EditValue`, propType: PropertyType.String, value: new BinaryWriter().string(edits.title!).toBuffer() },
       ]);
       fields.push({ name: `${EDIT_REQUIRED_REF_STR} ${ALBUM_EDIT}::Title`, propType: PropertyType.Object, value: w });
     }
@@ -595,6 +625,8 @@ export class RoonClient {
 /** Reversible album metadata edits (see RoonClient.editAlbum). */
 export interface AlbumEdits {
   title?: string;
+  /** Send Title.ClearEdits to drop the user's title edit and restore the original. Exclusive with `title`. */
+  clearTitle?: boolean;
   rating?: number;
   addGenres?: string[];
   removeGenres?: string[];
@@ -617,8 +649,12 @@ export interface EditField<T> {
   value: T | undefined;
   /** the metadata (publisher) value, before any local/user edit. */
   metadataValue?: T;
-  /** true when the user has a local edit overriding metadata. */
+  /** the user's edit (EditValue); undefined when the field was never edited. */
+  editValue?: T;
+  /** true when the user has a local edit overriding metadata: EditValue is set (lists: AddValues/RemoveValues non-empty). */
   edited: boolean;
+  /** the album has an edit layer (HasEditLayer); this alone does not mean the field was edited. */
+  hasEditLayer: boolean;
 }
 
 export interface AlbumEditInfo {
@@ -665,10 +701,19 @@ function editField<T>(info: Record<string, unknown>, fieldSuffix: string, list =
   const rawMeta = member(wrapper, list ? '::MetadataValues' : '::MetadataValue');
   const value = (list ? decodeStringList(rawValue) : rawValue) as T | undefined;
   const metadataValue = (list ? decodeStringList(rawMeta) : rawMeta) as T | undefined;
-  return { value, metadataValue, edited: member(wrapper, '::HasEditLayer') === true };
+  const hasEditLayer = member(wrapper, '::HasEditLayer') === true;
+  if (list) {
+    // EditListInfo has no EditValue; user changes live in AddValues/RemoveValues.
+    const changed = [member(wrapper, '::AddValues'), member(wrapper, '::RemoveValues')]
+      .some((v) => (decodeStringList(v)?.length ?? 0) > 0);
+    return { value, metadataValue, edited: changed, hasEditLayer };
+  }
+  const rawEdit = member(wrapper, '::EditValue');
+  const editValue = (rawEdit === null ? undefined : rawEdit) as T | undefined;
+  return { value, metadataValue, editValue, edited: editValue !== undefined, hasEditLayer };
 }
 
-function parseAlbumEditInfo(decoded: Record<string, unknown>): AlbumEditInfo {
+export function parseAlbumEditInfo(decoded: Record<string, unknown>): AlbumEditInfo {
   return {
     title: editField<string>(decoded, 'Title'),
     version: editField<string>(decoded, 'Version'),

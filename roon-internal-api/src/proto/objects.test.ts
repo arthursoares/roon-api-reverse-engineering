@@ -198,3 +198,33 @@ describe('DataList collection wire encoding', () => {
     expect(g.getObject(99n)!.fields).toEqual({ $count: 2, $items: [{ $ref: 901n }, { $ref: 902n }] });
   });
 });
+
+describe('IList return values', () => {
+  const ITEM = 'Sooloos.Broker.Api.RestoreItem';
+  function graphWithItemType(): ObjectGraph {
+    const g = new ObjectGraph();
+    g.types.set(5, { id: 5, name: ITEM, members: [{ name: `string ${ITEM}::BackupName`, propType: PropertyType.String }] });
+    return g;
+  }
+  /** IList<T> return value: flexInt(len) + flexInt(count) + one Object-encoded value per item. */
+  function listPayload(): Buffer {
+    const fields = new BinaryWriter().flexInt(1).string('b_20260101000000').flexInt(0).toBuffer();
+    const body = new BinaryWriter().flexInt(2)
+      .long(1).integer(5).integer(fields.length).bytes(fields) // inline struct
+      .long(42) // object reference
+      .toBuffer();
+    return new BinaryWriter().flexInt(body.length).bytes(body).toBuffer();
+  }
+
+  test('decodeListReturnValue decodes inline structs and object references', () => {
+    const items = graphWithItemType().decodeListReturnValue(listPayload());
+    expect(items).toEqual([{ $type: ITEM, [`string ${ITEM}::BackupName`]: 'b_20260101000000' }, { $ref: 42n }]);
+  });
+
+  test('length mismatches and trailing bytes throw instead of returning partial results', () => {
+    const payload = listPayload();
+    expect(() => graphWithItemType().decodeListReturnValue(payload.subarray(0, payload.length - 1))).toThrow();
+    const padded = Buffer.concat([new BinaryWriter().flexInt(payload.length).toBuffer(), payload.subarray(1), Buffer.from([0])]);
+    expect(() => graphWithItemType().decodeListReturnValue(padded)).toThrow();
+  });
+});
