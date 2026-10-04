@@ -249,6 +249,50 @@ describe('UnifiedSearch', () => {
     expect((await limited).map((o) => o.oid)).toEqual([902n]);
   });
 
+  test('per-category top picks rank first when TopSearchResults is empty (Core 2.73)', async () => {
+    // Shape observed live on Core 2.73 build 1696: TopSearchResults is an
+    // empty DataList for every query, and the ranking arrives as singletons.
+    // "beethoven" returned TopComposer = Ludwig van Beethoven, which the
+    // broad Performers/Composers lists placed 36th.
+    const { c, t } = buildClient();
+    seedCore(c);
+    seed(c, 901n, 'Sooloos.Broker.Api.PerformerLite'); // Camper Van Beethoven
+    seed(c, 902n, 'Sooloos.Broker.Api.PerformerLite'); // Ludwig van Beethoven
+    seed(c, 903n, 'Sooloos.Broker.Api.AlbumLite');
+    seed(c, 904n, 'Sooloos.Broker.Api.TrackLite');
+    seed(c, 100n, 'Sooloos.Broker.Api.UnifiedSearchResults', {
+      'UnifiedSearchResults::TopSearchResults': { $ref: 101n },
+      'UnifiedSearchResults::TopComposer': { $ref: 902n },
+      'UnifiedSearchResults::TopTrack': { $ref: 102n },
+      'UnifiedSearchResults::Performers': { $ref: 104n },
+      'UnifiedSearchResults::Composers': { $ref: 105n },
+      'UnifiedSearchResults::Albums': { $ref: 106n },
+      'UnifiedSearchResults::Playlists': { $ref: 107n },
+    });
+    seed(c, 101n, 'Sooloos.Broker.Api.DataList<Sooloos.Broker.Api.TopSearchResult>', { $count: 0, $items: [] });
+    seed(c, 102n, 'Sooloos.Broker.Api.TrackLiteVersions', { 'TrackLiteVersions::Tracks': { $ref: 103n } });
+    seed(c, 103n, 'Sooloos.Broker.Api.DataList<Sooloos.Broker.Api.TrackLite>', { $count: 1, $items: [{ $ref: 904n }] });
+    seed(c, 104n, 'Sooloos.Broker.Api.DataList<Sooloos.Broker.Api.PerformerLite>', {
+      $count: 2, $items: [{ $ref: 901n }, { $ref: 902n }],
+    });
+    seed(c, 105n, 'Sooloos.Broker.Api.DataList<Sooloos.Broker.Api.PerformerLite>', { $count: 1, $items: [{ $ref: 902n }] });
+    seed(c, 106n, 'Sooloos.Broker.Api.DataList<Sooloos.Broker.Api.AlbumLite>', { $count: 1, $items: [{ $ref: 903n }] });
+    seed(c, 910n, 'Sooloos.Broker.Api.Playlist');
+    seed(c, 107n, 'Sooloos.Broker.Api.DataList<Sooloos.Broker.Api.Playlist>', { $count: 1, $items: [{ $ref: 910n }] });
+
+    const p = c.search('beethoven', 10);
+    respondSearch(t, 100n);
+    // Top picks first (each once), then the broad lists in their usual order.
+    expect((await p).map((o) => o.oid)).toEqual([904n, 902n, 901n, 903n]);
+    const top = c.search('beethoven', 1);
+    respondSearch(t, 100n);
+    expect((await top).map((o) => o.oid)).toEqual([904n]);
+    // Opted-in playlist/genre sections still follow every top pick.
+    const optedIn = c.search('beethoven', 10, true);
+    respondSearch(t, 100n);
+    expect((await optedIn).map((o) => o.oid)).toEqual([904n, 902n, 910n, 901n, 903n]);
+  });
+
   test('waits for only the returned membership graph when objects arrive after the callback', async () => {
     const { c, t } = buildClient();
     seedCore(c);

@@ -157,8 +157,9 @@ export class RoonClient {
   /**
    * Library::UnifiedSearch — library and streaming-catalog results.
    * Resolve only the callback's result graph. TopSearchResults keep the Core's
-   * ranking, followed by highlighted albums and category lists in a stable
-   * order. Version lists preserve their order; repeated OIDs appear once.
+   * ranking, followed by the per-category top picks (TopAlbum, TopPerformer,
+   * TopTrack, TopComposer, TopWork and their Library twins) and category lists
+   * in a stable order. Version lists preserve their order; repeated OIDs appear once.
    * Opt in to playlist and genre hits with includePlaylistsAndGenres. Their
    * lists follow ranked hits/highlights and precede broad categories so large
    * performer lists do not consume the entire result limit first.
@@ -219,14 +220,20 @@ export class RoonClient {
     if (!root.typeName.endsWith('.UnifiedSearchResults')) {
       throw new Error('UnifiedSearch returned an unexpected result type');
     }
-    const rootMembers = ['TopSearchResults', 'TopAlbum', 'TopLibraryAlbum',
+    // The Core reports its top picks as per-category singletons; on Core 2.73
+    // TopSearchResults stayed empty for every query tried, so these carry the
+    // ranking. Visit them all before the broad lists.
+    const topMembers = ['TopAlbum', 'TopLibraryAlbum', 'TopPerformer', 'TopLibraryPerformer',
+      'TopTrack', 'TopLibraryTrack', 'TopComposer', 'TopLibraryComposer',
+      'TopWork', 'TopLibraryWork'];
+    const rootMembers = ['TopSearchResults', ...topMembers,
       'Performers', 'Composers', 'Albums', 'Tracks', 'Works'];
     // Full entities implement their Lite interfaces and can already occupy a
     // returned OID in the shared graph. They remain terminal search hits.
     const leaves = new Set(['AlbumLite', 'TrackLite', 'PerformerLite', 'WorkLite',
       'Album', 'Track', 'Performer', 'Work']);
     if (includePlaylistsAndGenres) {
-      rootMembers.splice(3, 0, 'Playlists', 'Genres');
+      rootMembers.splice(1 + topMembers.length, 0, 'Playlists', 'Genres');
       for (const type of ['Playlist', 'BrowserGenre', 'GenreLite']) leaves.add(type);
     }
     const seen = new Set<bigint>();
