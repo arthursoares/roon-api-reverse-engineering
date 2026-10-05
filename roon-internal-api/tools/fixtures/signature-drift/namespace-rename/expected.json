@@ -1,0 +1,12 @@
+{
+ "namespaceAlias": true,
+ "drift": [],
+ "bindings": [
+  { "name": "Sooloos.Broker.Api.Library::VirtualAlbumQuery(System.Sooid, Sooloos.Broker.Api.AlbumQueryCriteria, Sooloos.Broker.Api.VirtualQueryParameters, Base.ResultCallback<Sooloos.Broker.Api.VirtualAlbumLiteQuery>)", "via": "declared", "chain": [], "substituted": false },
+  { "name": "Sooloos.Broker.Api.Library::UnifiedSearch(Sooloos.Broker.Api.SearchParameters, Base.ResultCallback<Sooloos.Broker.Api.UnifiedSearchResults>)", "via": "declared" },
+  { "name": "System.Sooid Sooloos.Broker.Api.SearchParameters::ProfileId", "via": "declared" },
+  { "name": "string Sooloos.Broker.Api.SearchParameters::Terms", "via": "declared" },
+  { "name": "Sooloos.Broker.Api.AlbumQueryCriteria::TextFilter", "via": "declared" },
+  { "name": "Sooloos.Broker.Api.VirtualQueryParameters::PageSize", "via": "declared" }
+ ]
+}

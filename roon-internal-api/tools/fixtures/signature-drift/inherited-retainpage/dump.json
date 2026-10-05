@@ -1,0 +1,47 @@
+{
+ "format": "roon-broker-api-dump",
+ "formatVersion": 1,
+ "generator": "synthetic fixture (pre-2.71 namespace)",
+ "declaredOnly": true,
+ "types": [
+  {
+   "name": "Sooloos.Broker.Api.VirtualQuery`2",
+   "kind": "interface",
+   "genericParams": ["API_LITE", "API_BASE"],
+   "interfaces": ["System.IDisposable"],
+   "attributes": ["ByRefAttribute"],
+   "methods": [
+    { "name": "get_Count", "params": [], "returns": "int" },
+    { "name": "RetainPage", "params": ["int", "Base.ResultCallback"], "returns": "void" },
+    { "name": "ReleasePage", "params": ["int", "Base.ResultCallback"], "returns": "void" },
+    { "name": "GetSelected", "params": ["Base.ResultCallback<System.Collections.Generic.IList<API_BASE>>"], "returns": "void" },
+    { "name": "SelectToggle", "params": ["Sooloos.Broker.Api.VirtualQueryElement<API_LITE>", "bool", "Base.ResultCallback"], "returns": "void" }
+   ]
+  },
+  {
+   "name": "Sooloos.Broker.Api.VirtualAlbumLiteQuery",
+   "kind": "interface",
+   "interfaces": ["Sooloos.Broker.Api.VirtualQuery<Sooloos.Broker.Api.AlbumLite, Sooloos.Broker.Api.AlbumBase>", "System.IDisposable"],
+   "attributes": ["ByRefAttribute"],
+   "methods": [{ "name": "get_SelectionIsFavoriteCount", "params": [], "returns": "int" }]
+  },
+  {
+   "name": "Sooloos.Broker.Api.VirtualHistoryPlayQuery",
+   "kind": "interface",
+   "interfaces": ["Sooloos.Broker.Api.VirtualQuery<Sooloos.Broker.Api.HistoryPlay, Sooloos.Broker.Api.HistoryPlayBase>", "System.IDisposable"],
+   "attributes": ["ByRefAttribute"]
+  },
+  {
+   "name": "Sooloos.Broker.Api.Library",
+   "kind": "interface",
+   "attributes": ["ByRefAttribute"],
+   "methods": [{ "name": "VirtualAlbumQuery", "params": ["System.Sooid", "Base.ResultCallback<Sooloos.Broker.Api.VirtualAlbumLiteQuery>"], "returns": "void" }]
+  },
+  {
+   "name": "Sooloos.Broker.Api.Pager",
+   "kind": "interface",
+   "attributes": ["ByRefAttribute"],
+   "methods": [{ "name": "RetainPage", "params": ["int", "Base.ResultCallback"], "returns": "void" }]
+  }
+ ]
+}

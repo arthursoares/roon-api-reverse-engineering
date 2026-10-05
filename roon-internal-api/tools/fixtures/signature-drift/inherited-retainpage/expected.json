@@ -1,0 +1,15 @@
+{
+ "namespaceAlias": false,
+ "drift": [
+  { "code": "METHOD_DRIFT", "name": "Sooloos.Broker.Api.Library::RetainPage(int, Base.ResultCallback)", "hint": "unrelated type(s) VirtualQuery`2, Pager" },
+  { "code": "METHOD_DRIFT", "name": "Sooloos.Broker.Api.VirtualHistoryPlayQuery::GetSelected(Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumBase>>)" }
+ ],
+ "bindings": [
+  { "name": "Sooloos.Broker.Api.VirtualAlbumLiteQuery::RetainPage(int, Base.ResultCallback)", "via": "inherited", "chain": ["inherited from VirtualQuery`2 [API_LITE=AlbumLite, API_BASE=AlbumBase]"], "substituted": false },
+  { "name": "Sooloos.Broker.Api.VirtualHistoryPlayQuery::ReleasePage(int, Base.ResultCallback)", "via": "inherited", "chain": ["inherited from VirtualQuery`2 [API_LITE=HistoryPlay, API_BASE=HistoryPlayBase]"] },
+  { "name": "Sooloos.Broker.Api.VirtualHistoryPlayQuery::Dispose()", "via": "bcl", "chain": ["BCL contract System.IDisposable (not in dump)"] },
+  { "name": "Sooloos.Broker.Api.VirtualAlbumLiteQuery::GetSelected(Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumBase>>)", "via": "inherited", "chain": ["inherited from VirtualQuery`2 [API_LITE=AlbumLite, API_BASE=AlbumBase]"], "substituted": true },
+  { "name": "Sooloos.Broker.Api.VirtualAlbumLiteQuery::SelectToggle(Sooloos.Broker.Api.VirtualQueryElement<Sooloos.Broker.Api.AlbumLite>, bool, Base.ResultCallback)", "via": "inherited", "substituted": true },
+  { "name": "Sooloos.Broker.Api.VirtualQuery`2::GetSelected(Base.ResultCallback<System.Collections.Generic.IList<API_BASE>>)", "via": "declared", "chain": [], "substituted": false }
+ ]
+}

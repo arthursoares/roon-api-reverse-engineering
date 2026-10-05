@@ -1,0 +1,11 @@
+{
+ "names": [
+  { "kind": "method", "name": "Sooloos.Broker.Api.Library::VirtualAlbumQuery(System.Sooid, Sooloos.Broker.Api.AlbumQueryCriteria, Sooloos.Broker.Api.VirtualQueryParameters, Base.ResultCallback<Sooloos.Broker.Api.VirtualAlbumLiteQuery>)" },
+  { "kind": "method", "name": "Sooloos.Broker.Api.Library::UnifiedSearch(Sooloos.Broker.Api.SearchParameters, Base.ResultCallback<Sooloos.Broker.Api.UnifiedSearchResults>)" },
+  { "kind": "member", "name": "System.Sooid Sooloos.Broker.Api.SearchParameters::ProfileId" },
+  { "kind": "member", "name": "string Sooloos.Broker.Api.SearchParameters::Terms" },
+  { "kind": "type", "name": "Sooloos.Broker.Api.SearchParameters" },
+  { "kind": "shortMember", "owner": "Sooloos.Broker.Api.AlbumQueryCriteria", "name": "TextFilter" },
+  { "kind": "shortMember", "owner": "Sooloos.Broker.Api.VirtualQueryParameters", "name": "PageSize" }
+ ]
+}

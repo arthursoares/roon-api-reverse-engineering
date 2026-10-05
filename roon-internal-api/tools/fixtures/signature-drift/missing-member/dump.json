@@ -1,0 +1,36 @@
+{
+ "format": "roon-broker-api-dump",
+ "formatVersion": 1,
+ "generator": "synthetic fixture",
+ "declaredOnly": true,
+ "types": [
+  {
+   "name": "Roon.Broker.Api.Library",
+   "kind": "interface",
+   "attributes": ["ByRefAttribute"],
+   "methods": [
+    { "name": "GetDailyPicks", "params": ["System.Sooid", "Roon.Broker.Api.DailyPicksParameters", "Base.ResultCallback<Roon.Broker.Api.DataList<Roon.Broker.Api.DailyPicksBox>>"], "returns": "void" },
+    { "name": "UnifiedSearch", "params": ["Roon.Broker.Api.SearchParameters", "Base.ResultCallback<Roon.Broker.Api.UnifiedSearchResults>"], "returns": "void" }
+   ]
+  },
+  {
+   "name": "Roon.Broker.Api.SearchParameters",
+   "kind": "class",
+   "extends": "object",
+   "attributes": ["ByValAttribute"],
+   "properties": [
+    { "name": "Terms", "type": "string" },
+    { "name": "MaxCount", "type": "int" }
+   ]
+  },
+  {
+   "name": "Roon.Broker.Api.SearchTrace",
+   "kind": "class",
+   "extends": "object",
+   "attributes": ["ByValAttribute"],
+   "properties": [{ "name": "TotalElapsedInMs", "type": "long" }],
+   "indexers": [{ "name": "Item", "type": "long", "params": ["string"] }]
+  },
+  { "name": "Roon.Broker.Api.DailyPicksParameters", "kind": "class", "extends": "object", "attributes": ["ByValAttribute"], "properties": [{ "name": "RecentlyAddedOnly", "type": "bool" }] }
+ ]
+}

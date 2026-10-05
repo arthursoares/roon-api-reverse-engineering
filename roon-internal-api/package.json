@@ -7,7 +7,8 @@
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "lint": "eslint src --ext .ts",
+    "lint": "eslint src tools --ext .ts",
+    "check:signatures": "ts-node tools/check_signatures.ts",
     "prepublishOnly": "npm run build"
   },
   "keywords": [

@@ -1,0 +1,14 @@
+{
+ "names": [
+  { "kind": "method", "name": "Sooloos.Broker.Api.Library::GetDailyPicks(System.Sooid, string, bool, Base.ResultCallback<Sooloos.Broker.Api.DataList<Sooloos.Broker.Api.DailyPicksBox>>)" },
+  { "kind": "method", "name": "Sooloos.Broker.Api.Library::UnifiedSearch(Sooloos.Broker.Api.SearchParameters, Base.ResultCallback<Sooloos.Broker.Api.UnifiedSearchResults>)" },
+  { "kind": "method", "name": "Roon.Broker.Api.Library::UnifiedSearch(Roon.Broker.Api.SearchParameters, Base.ResultCallback<Roon.Broker.Api.UnifiedSearchResults>)" },
+  { "kind": "member", "name": "string Sooloos.Broker.Api.SearchParameters::Terms" },
+  { "kind": "member", "name": "int Sooloos.Broker.Api.SearchParameters::MaxTopResultCount" },
+  { "kind": "member", "name": "long Sooloos.Broker.Api.SearchParameters::MaxCount" },
+  { "kind": "member", "name": "long Sooloos.Broker.Api.SearchTrace::Item" },
+  { "kind": "type", "name": "Sooloos.Broker.Api.SearchParameters" },
+  { "kind": "type", "name": "Sooloos.Broker.Api.SearchOptions" },
+  { "kind": "shortMember", "owner": "Sooloos.Broker.Api.SearchParameters", "name": "IncludeHidden" }
+ ]
+}

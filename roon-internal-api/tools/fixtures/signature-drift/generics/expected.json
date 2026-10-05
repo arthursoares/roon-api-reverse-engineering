@@ -1,0 +1,17 @@
+{
+ "namespaceAlias": true,
+ "drift": [
+  { "code": "MEMBER_DRIFT", "name": "string Sooloos.Broker.Api.EditOptionalVal<int>::EditValue" },
+  { "code": "TYPE_DRIFT", "name": "Sooloos.Broker.Api.EditList<string, int>" },
+  { "code": "METHOD_DRIFT", "name": "Sooloos.Broker.Api.DataList<Sooloos.Broker.Api.Zone>::Insert(int, T)" }
+ ],
+ "bindings": [
+  { "name": "System.Collections.Generic.IList<string> Sooloos.Broker.Api.EditList<string>::AddValues", "via": "declared", "substituted": true },
+  { "name": "bool Sooloos.Broker.Api.EditList<string>::ClearEdits", "via": "declared", "substituted": false },
+  { "name": "int? Sooloos.Broker.Api.EditOptionalVal<int>::EditValue", "via": "declared", "substituted": true },
+  { "name": "Sooloos.Broker.Api.EditList<string> Sooloos.Broker.Api.AlbumEdit::Genres", "via": "declared", "substituted": false },
+  { "name": "Sooloos.Broker.Api.DataList`1::IndexOf(T)", "via": "bcl", "chain": ["BCL contract System.Collections.Generic.IList<T> (not in dump)"], "substituted": false },
+  { "name": "Sooloos.Broker.Api.DataList`1::get_IsLoading()", "via": "declared" },
+  { "name": "Sooloos.Broker.Api.DataList<Sooloos.Broker.Api.Zone>::Insert(int, Sooloos.Broker.Api.Zone)", "via": "bcl", "chain": ["BCL contract System.Collections.Generic.IList<Zone> (not in dump)"], "substituted": true }
+ ]
+}

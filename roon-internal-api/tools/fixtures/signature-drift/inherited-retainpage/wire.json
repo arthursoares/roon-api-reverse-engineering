@@ -1,0 +1,12 @@
+{
+ "names": [
+  { "kind": "method", "name": "Sooloos.Broker.Api.VirtualAlbumLiteQuery::RetainPage(int, Base.ResultCallback)" },
+  { "kind": "method", "name": "Sooloos.Broker.Api.VirtualHistoryPlayQuery::ReleasePage(int, Base.ResultCallback)" },
+  { "kind": "method", "name": "Sooloos.Broker.Api.VirtualHistoryPlayQuery::Dispose()" },
+  { "kind": "method", "name": "Sooloos.Broker.Api.VirtualAlbumLiteQuery::GetSelected(Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumBase>>)" },
+  { "kind": "method", "name": "Sooloos.Broker.Api.VirtualAlbumLiteQuery::SelectToggle(Sooloos.Broker.Api.VirtualQueryElement<Sooloos.Broker.Api.AlbumLite>, bool, Base.ResultCallback)" },
+  { "kind": "method", "name": "Sooloos.Broker.Api.VirtualQuery`2::GetSelected(Base.ResultCallback<System.Collections.Generic.IList<API_BASE>>)" },
+  { "kind": "method", "name": "Sooloos.Broker.Api.VirtualHistoryPlayQuery::GetSelected(Base.ResultCallback<System.Collections.Generic.IList<Sooloos.Broker.Api.AlbumBase>>)" },
+  { "kind": "method", "name": "Sooloos.Broker.Api.Library::RetainPage(int, Base.ResultCallback)" }
+ ]
+}

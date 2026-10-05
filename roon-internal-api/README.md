@@ -68,6 +68,30 @@ npm run build
 npm test
 ```
 
+### Signature drift after a Roon update
+
+The Core silently ignores a method signature or struct member name it does not know, so a
+Roon update that moves one makes a call quietly do nothing. `tools/check_signatures.ts`
+compares every wire name the SDK can send (generated and handwritten, extracted from the
+TypeScript source) with a metadata dump of the installed `Roon.Broker.Api.dll`, and checks
+the SDK against the committed catalog:
+
+```bash
+pip install dnfile
+python3 tools/dump_broker_api.py --dll /path/to/Roon.Broker.Api.dll --out /tmp/broker-api.json
+npm run check:signatures -- --dump /tmp/broker-api.json
+npm run check:signatures -- --catalog-only   # SDK vs committed catalog, no DLL
+npm run check:signatures -- --self-test      # synthetic fixtures (run in CI)
+```
+
+On macOS the DLL is `/Applications/Roon.app/Contents/MonoBundle/Roon.Broker.Api.dll`.
+Exit 1 means drift (`METHOD_DRIFT`, `MEMBER_DRIFT`, `TYPE_DRIFT`, each with a source
+location and the closest DLL names) or an SDK/catalog mismatch; exit 2 means unreadable,
+invalid or foreign input. Only the metadata-side `Roon.Broker.Api.` → `Sooloos.Broker.Api.`
+alias (#15) is normalized, with a printed `NAMESPACE_ALIAS` count. Inherited interface
+methods and generic instantiations are bound explicitly and reported. Dumps are derived
+from proprietary software: keep them out of the repository.
+
 ## Protocol Documentation
 
 See [ROON_INTERNAL_API.md](../docs/ROON_INTERNAL_API.md) for protocol details.

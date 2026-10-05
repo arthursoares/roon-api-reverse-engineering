@@ -46,6 +46,12 @@ jobs:
             roon-internal-api/src/generated/api.ts \
             roon-internal-api/src/generated/struct-schemas.ts \
             roon-internal-api/docs/reflist-audit.md
+      - name: Check SDK wire names against the committed catalog
+        run: npx ts-node tools/check_signatures.ts --catalog-only
+        working-directory: roon-internal-api
+      - name: Self-test the signature-drift checker
+        run: npx ts-node tools/check_signatures.ts --self-test
+        working-directory: roon-internal-api
 
       - name: Lint SDK
         run: npm run lint

@@ -30,7 +30,7 @@ roon-api-reverse-engineering/
 │  ├─ src/catalog/           signatures + the extracted method catalog (~1550 methods)
 │  ├─ src/generated/         generated typed API (one class per service)
 │  ├─ oracle/                C# tool: reads the Roon DLLs → the catalog JSON
-│  ├─ tools/                 codegen + capture-decoding scripts
+│  ├─ tools/                 codegen, DLL dump + signature-drift check
 │  └─ examples/              runnable PoCs (one per thing that works)
 ├─ roon-web/                 a small web client poking at the API
 ├─ docs/plans/              the raw working notes / decision log
@@ -95,6 +95,8 @@ npm test -- --runInBand
 npm run build
 npx ts-node tools/gen_client.ts
 git diff --exit-code -- src/generated/api.ts src/generated/struct-schemas.ts docs/reflist-audit.md
+npm run check:signatures -- --catalog-only
+npm run check:signatures -- --self-test
 ```
 
 The web client:
@@ -118,6 +120,26 @@ npm install
 npm run dev        # local preview
 npm run build      # what CI deploys
 ```
+
+## After a Roon update
+
+The Core silently drops a DEFMETHOD signature or struct member name it doesn't know, so
+check the SDK's wire names against the newly installed DLL (offline; needs Python and
+`pip install dnfile`):
+
+```bash
+cd roon-internal-api
+python3 tools/dump_broker_api.py --dll /Applications/Roon.app/Contents/MonoBundle/Roon.Broker.Api.dll --out /tmp/broker-api.json
+npm run check:signatures -- --dump /tmp/broker-api.json
+```
+
+Each `METHOD_DRIFT`, `MEMBER_DRIFT` or `TYPE_DRIFT` names the source line that sends the
+stale name and the closest names the DLL declares; the report also lists what the committed
+catalog and the new DLL disagree on. Only the evidenced `Roon.Broker.Api.` →
+`Sooloos.Broker.Api.` metadata alias is normalized (the wire keeps `Sooloos.*`). Inherited
+and generic bindings are modeled explicitly; a same-named method on an unrelated type is
+never accepted. Runtime-only names are listed as `UNRESOLVED`. A clean name check does not
+validate a serializer — see below. Don't commit the dump.
 
 ## Validating a method
 
@@ -154,9 +176,8 @@ UnifiedSearch now follows the callback's result memberships, including cached an
 concurrent results. Broader provider/version coverage remains useful, but collecting
 global graph objects or substring matches is not the current search implementation.
 
-The open [signature-drift checker proposal](https://github.com/arthursoares/roon-api-reverse-engineering/issues/16)
-is a scoped next contribution: compare shipping wire names with an explicit installed-DLL
-dump, normalize only evidenced aliases, and include deterministic fixtures/self-tests.
+A runtime watcher that flags a Core version never checked for drift (the follow-up to
+[#16](https://github.com/arthursoares/roon-api-reverse-engineering/issues/16)) is still open.
 Most generated methods still need independent byte-level and live validation.
 
 Keep the historical capture and investigation notes under `docs/plans/` intact; they

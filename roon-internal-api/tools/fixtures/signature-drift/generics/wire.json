@@ -1,0 +1,15 @@
+{
+ "names": [
+  { "kind": "member", "name": "System.Collections.Generic.IList<string> Sooloos.Broker.Api.EditList<string>::AddValues" },
+  { "kind": "member", "name": "bool Sooloos.Broker.Api.EditList<string>::ClearEdits" },
+  { "kind": "member", "name": "int? Sooloos.Broker.Api.EditOptionalVal<int>::EditValue" },
+  { "kind": "member", "name": "string Sooloos.Broker.Api.EditOptionalVal<int>::EditValue" },
+  { "kind": "member", "name": "Sooloos.Broker.Api.EditList<string> Sooloos.Broker.Api.AlbumEdit::Genres" },
+  { "kind": "type", "name": "Sooloos.Broker.Api.EditList<string>" },
+  { "kind": "type", "name": "Sooloos.Broker.Api.EditList<string, int>" },
+  { "kind": "method", "name": "Sooloos.Broker.Api.DataList`1::IndexOf(T)" },
+  { "kind": "method", "name": "Sooloos.Broker.Api.DataList`1::get_IsLoading()" },
+  { "kind": "method", "name": "Sooloos.Broker.Api.DataList<Sooloos.Broker.Api.Zone>::Insert(int, Sooloos.Broker.Api.Zone)" },
+  { "kind": "method", "name": "Sooloos.Broker.Api.DataList<Sooloos.Broker.Api.Zone>::Insert(int, T)" }
+ ]
+}

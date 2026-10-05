@@ -1,0 +1,40 @@
+{
+ "format": "roon-broker-api-dump",
+ "formatVersion": 1,
+ "generator": "synthetic fixture",
+ "assembly": { "name": "Roon.Broker.Api", "file": "synthetic" },
+ "declaredOnly": true,
+ "types": [
+  {
+   "name": "Roon.Broker.Api.Library",
+   "kind": "interface",
+   "genericParams": [],
+   "extends": null,
+   "interfaces": [],
+   "attributes": ["ByRefAttribute"],
+   "methods": [
+    { "name": "VirtualAlbumQuery", "params": ["System.Sooid", "Roon.Broker.Api.AlbumQueryCriteria", "Roon.Broker.Api.VirtualQueryParameters", "Base.ResultCallback<Roon.Broker.Api.VirtualAlbumLiteQuery>"], "returns": "void" },
+    { "name": "UnifiedSearch", "params": ["Roon.Broker.Api.SearchParameters", "Base.ResultCallback<Roon.Broker.Api.UnifiedSearchResults>"], "returns": "void" }
+   ],
+   "properties": [],
+   "indexers": []
+  },
+  {
+   "name": "Roon.Broker.Api.SearchParameters",
+   "kind": "class",
+   "genericParams": [],
+   "extends": "object",
+   "interfaces": [],
+   "attributes": ["ByValAttribute"],
+   "methods": [],
+   "properties": [
+    { "name": "ProfileId", "type": "System.Sooid" },
+    { "name": "Terms", "type": "string" },
+    { "name": "MaxCount", "type": "int" }
+   ],
+   "indexers": []
+  },
+  { "name": "Roon.Broker.Api.AlbumQueryCriteria", "kind": "class", "extends": "object", "attributes": ["ByValAttribute"], "properties": [{ "name": "TextFilter", "type": "string" }] },
+  { "name": "Roon.Broker.Api.VirtualQueryParameters", "kind": "class", "extends": "object", "attributes": ["ByValAttribute"], "properties": [{ "name": "PageSize", "type": "int" }] }
+ ]
+}

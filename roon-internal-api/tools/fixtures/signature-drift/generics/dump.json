@@ -1,0 +1,46 @@
+{
+ "format": "roon-broker-api-dump",
+ "formatVersion": 1,
+ "generator": "synthetic fixture",
+ "declaredOnly": true,
+ "types": [
+  {
+   "name": "Roon.Broker.Api.EditList`1",
+   "kind": "class",
+   "genericParams": ["T"],
+   "extends": "object",
+   "attributes": ["ByValAttribute"],
+   "properties": [
+    { "name": "ClearEdits", "type": "bool" },
+    { "name": "AddValues", "type": "System.Collections.Generic.IList<T>" },
+    { "name": "RemoveValues", "type": "System.Collections.Generic.IList<T>" }
+   ]
+  },
+  {
+   "name": "Roon.Broker.Api.EditOptionalVal`1",
+   "kind": "class",
+   "genericParams": ["T"],
+   "extends": "object",
+   "attributes": ["ByValAttribute"],
+   "properties": [{ "name": "EditValue", "type": "T?" }]
+  },
+  {
+   "name": "Roon.Broker.Api.AlbumEdit",
+   "kind": "class",
+   "extends": "object",
+   "attributes": ["ByValAttribute"],
+   "properties": [
+    { "name": "Genres", "type": "Roon.Broker.Api.EditList<string>" },
+    { "name": "Rating", "type": "Roon.Broker.Api.EditOptionalVal<int>" }
+   ]
+  },
+  {
+   "name": "Roon.Broker.Api.DataList`1",
+   "kind": "interface",
+   "genericParams": ["T"],
+   "interfaces": ["System.Collections.Generic.IList<T>", "System.Collections.Generic.ICollection<T>", "System.Collections.Generic.IEnumerable<T>", "System.Collections.IEnumerable"],
+   "attributes": ["ByRefAttribute"],
+   "methods": [{ "name": "get_IsLoading", "params": [], "returns": "bool" }]
+  }
+ ]
+}

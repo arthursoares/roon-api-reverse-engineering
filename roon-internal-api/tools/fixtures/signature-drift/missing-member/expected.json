@@ -1,0 +1,16 @@
+{
+ "namespaceAlias": true,
+ "drift": [
+  { "code": "METHOD_DRIFT", "name": "Sooloos.Broker.Api.Library::GetDailyPicks(System.Sooid, string, bool, Base.ResultCallback<Sooloos.Broker.Api.DataList<Sooloos.Broker.Api.DailyPicksBox>>)" },
+  { "code": "METHOD_DRIFT", "name": "Roon.Broker.Api.Library::UnifiedSearch(Roon.Broker.Api.SearchParameters, Base.ResultCallback<Roon.Broker.Api.UnifiedSearchResults>)", "hint": "#15" },
+  { "code": "MEMBER_DRIFT", "name": "int Sooloos.Broker.Api.SearchParameters::MaxTopResultCount" },
+  { "code": "MEMBER_DRIFT", "name": "long Sooloos.Broker.Api.SearchParameters::MaxCount" },
+  { "code": "MEMBER_DRIFT", "name": "long Sooloos.Broker.Api.SearchTrace::Item", "hint": "indexer" },
+  { "code": "MEMBER_DRIFT", "name": "Sooloos.Broker.Api.SearchParameters::IncludeHidden" },
+  { "code": "TYPE_DRIFT", "name": "Sooloos.Broker.Api.SearchOptions" }
+ ],
+ "bindings": [
+  { "name": "Sooloos.Broker.Api.Library::UnifiedSearch(Sooloos.Broker.Api.SearchParameters, Base.ResultCallback<Sooloos.Broker.Api.UnifiedSearchResults>)", "via": "declared" },
+  { "name": "string Sooloos.Broker.Api.SearchParameters::Terms", "via": "declared" }
+ ]
+}
