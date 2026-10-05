@@ -862,17 +862,24 @@ export class VirtualQueryElement_1Api extends ServiceBase {
 }
 
 export class VirtualQuery_2Api extends ServiceBase {
+  /** Prefer the concrete query class: page calls are verified only under the
+   * derived declaring type (e.g. VirtualAlbumLiteQuery), not this open-generic name. */
   async retainPage(pagen: number): Promise<CallResult> {
     const parts: Buffer[] = [
       buildArgs([Arg.int(Number(pagen ?? 0))]),
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.VirtualQuery`2::RetainPage(int, Base.ResultCallback)", Buffer.concat(parts));
   }
-  async releasePage(pagen: number): Promise<CallResult> {
+  /** Prefer the concrete query class: page calls are verified only under the
+   * derived declaring type (e.g. VirtualAlbumLiteQuery), not this open-generic name. */
+  /** Fire-and-forget: the Core releases the page but never answers. Call exactly
+   * once per successful retainPage and never retry — over-releasing corrupts the
+   * Core's page refcount. */
+  releasePage(pagen: number): void {
     const parts: Buffer[] = [
       buildArgs([Arg.int(Number(pagen ?? 0))]),
     ];
-    return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.VirtualQuery`2::ReleasePage(int, Base.ResultCallback)", Buffer.concat(parts));
+    this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.VirtualQuery`2::ReleasePage(int, Base.ResultCallback)", Buffer.concat(parts));
   }
   async getSelected(): Promise<CallResult> {
     const parts: Buffer[] = [
@@ -9619,11 +9626,14 @@ export class VirtualHistoryPlayQueryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.VirtualHistoryPlayQuery::RetainPage(int, Base.ResultCallback)", Buffer.concat(parts));
   }
-  async releasePage(pagen: number): Promise<CallResult> {
+  /** Fire-and-forget: the Core releases the page but never answers. Call exactly
+   * once per successful retainPage and never retry — over-releasing corrupts the
+   * Core's page refcount. */
+  releasePage(pagen: number): void {
     const parts: Buffer[] = [
       buildArgs([Arg.int(Number(pagen ?? 0))]),
     ];
-    return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.VirtualHistoryPlayQuery::ReleasePage(int, Base.ResultCallback)", Buffer.concat(parts));
+    this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.VirtualHistoryPlayQuery::ReleasePage(int, Base.ResultCallback)", Buffer.concat(parts));
   }
   async getSelected(): Promise<CallResult> {
     const parts: Buffer[] = [
@@ -9710,11 +9720,14 @@ export class VirtualTrackLiteQueryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.VirtualTrackLiteQuery::RetainPage(int, Base.ResultCallback)", Buffer.concat(parts));
   }
-  async releasePage(pagen: number): Promise<CallResult> {
+  /** Fire-and-forget: the Core releases the page but never answers. Call exactly
+   * once per successful retainPage and never retry — over-releasing corrupts the
+   * Core's page refcount. */
+  releasePage(pagen: number): void {
     const parts: Buffer[] = [
       buildArgs([Arg.int(Number(pagen ?? 0))]),
     ];
-    return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.VirtualTrackLiteQuery::ReleasePage(int, Base.ResultCallback)", Buffer.concat(parts));
+    this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.VirtualTrackLiteQuery::ReleasePage(int, Base.ResultCallback)", Buffer.concat(parts));
   }
   async getSelected(): Promise<CallResult> {
     const parts: Buffer[] = [
@@ -9801,11 +9814,14 @@ export class VirtualPlaylistItemQueryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.VirtualPlaylistItemQuery::RetainPage(int, Base.ResultCallback)", Buffer.concat(parts));
   }
-  async releasePage(pagen: number): Promise<CallResult> {
+  /** Fire-and-forget: the Core releases the page but never answers. Call exactly
+   * once per successful retainPage and never retry — over-releasing corrupts the
+   * Core's page refcount. */
+  releasePage(pagen: number): void {
     const parts: Buffer[] = [
       buildArgs([Arg.int(Number(pagen ?? 0))]),
     ];
-    return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.VirtualPlaylistItemQuery::ReleasePage(int, Base.ResultCallback)", Buffer.concat(parts));
+    this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.VirtualPlaylistItemQuery::ReleasePage(int, Base.ResultCallback)", Buffer.concat(parts));
   }
   async getSelected(): Promise<CallResult> {
     const parts: Buffer[] = [
@@ -9904,11 +9920,14 @@ export class VirtualFolderItemQueryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.VirtualFolderItemQuery::RetainPage(int, Base.ResultCallback)", Buffer.concat(parts));
   }
-  async releasePage(pagen: number): Promise<CallResult> {
+  /** Fire-and-forget: the Core releases the page but never answers. Call exactly
+   * once per successful retainPage and never retry — over-releasing corrupts the
+   * Core's page refcount. */
+  releasePage(pagen: number): void {
     const parts: Buffer[] = [
       buildArgs([Arg.int(Number(pagen ?? 0))]),
     ];
-    return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.VirtualFolderItemQuery::ReleasePage(int, Base.ResultCallback)", Buffer.concat(parts));
+    this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.VirtualFolderItemQuery::ReleasePage(int, Base.ResultCallback)", Buffer.concat(parts));
   }
   async getSelected(): Promise<CallResult> {
     const parts: Buffer[] = [
@@ -9995,11 +10014,14 @@ export class VirtualAlbumLiteQueryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.VirtualAlbumLiteQuery::RetainPage(int, Base.ResultCallback)", Buffer.concat(parts));
   }
-  async releasePage(pagen: number): Promise<CallResult> {
+  /** Fire-and-forget: the Core releases the page but never answers. Call exactly
+   * once per successful retainPage and never retry — over-releasing corrupts the
+   * Core's page refcount. */
+  releasePage(pagen: number): void {
     const parts: Buffer[] = [
       buildArgs([Arg.int(Number(pagen ?? 0))]),
     ];
-    return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.VirtualAlbumLiteQuery::ReleasePage(int, Base.ResultCallback)", Buffer.concat(parts));
+    this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.VirtualAlbumLiteQuery::ReleasePage(int, Base.ResultCallback)", Buffer.concat(parts));
   }
   async getSelected(): Promise<CallResult> {
     const parts: Buffer[] = [
@@ -10086,11 +10108,14 @@ export class VirtualWorkLiteQueryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.VirtualWorkLiteQuery::RetainPage(int, Base.ResultCallback)", Buffer.concat(parts));
   }
-  async releasePage(pagen: number): Promise<CallResult> {
+  /** Fire-and-forget: the Core releases the page but never answers. Call exactly
+   * once per successful retainPage and never retry — over-releasing corrupts the
+   * Core's page refcount. */
+  releasePage(pagen: number): void {
     const parts: Buffer[] = [
       buildArgs([Arg.int(Number(pagen ?? 0))]),
     ];
-    return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.VirtualWorkLiteQuery::ReleasePage(int, Base.ResultCallback)", Buffer.concat(parts));
+    this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.VirtualWorkLiteQuery::ReleasePage(int, Base.ResultCallback)", Buffer.concat(parts));
   }
   async getSelected(): Promise<CallResult> {
     const parts: Buffer[] = [
@@ -10177,11 +10202,14 @@ export class VirtualPerformerLiteQueryApi extends ServiceBase {
     ];
     return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.VirtualPerformerLiteQuery::RetainPage(int, Base.ResultCallback)", Buffer.concat(parts));
   }
-  async releasePage(pagen: number): Promise<CallResult> {
+  /** Fire-and-forget: the Core releases the page but never answers. Call exactly
+   * once per successful retainPage and never retry — over-releasing corrupts the
+   * Core's page refcount. */
+  releasePage(pagen: number): void {
     const parts: Buffer[] = [
       buildArgs([Arg.int(Number(pagen ?? 0))]),
     ];
-    return this.c.remoting.callMethod(this.oid, "Sooloos.Broker.Api.VirtualPerformerLiteQuery::ReleasePage(int, Base.ResultCallback)", Buffer.concat(parts));
+    this.c.remoting.callMethodNoReply(this.oid, "Sooloos.Broker.Api.VirtualPerformerLiteQuery::ReleasePage(int, Base.ResultCallback)", Buffer.concat(parts));
   }
   async getSelected(): Promise<CallResult> {
     const parts: Buffer[] = [

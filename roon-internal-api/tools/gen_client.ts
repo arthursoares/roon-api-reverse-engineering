@@ -227,6 +227,24 @@ class ServiceBase {
 }
 `;
 
+// Methods whose signature carries a ResultCallback the Core never invokes.
+// VirtualQuery`2::ReleasePage (inherited by every Virtual*Query) executes the
+// release but sends no response — verified live on VirtualAlbumLiteQuery and
+// VirtualHistoryPlayQuery (Core 2.71/2.73); the official client calls it
+// through the callback-less RemotingClientV2.CallMethod(long, int, byte[])
+// overload. Awaiting it waits out the request timeout and rejects after a
+// successful release, which invites a retry — and a second release corrupts
+// the Core's page refcount. Emit these fire-and-forget.
+function neverResponds(m: { name: string; signature: string }): boolean {
+  return m.name === 'ReleasePage' && /::ReleasePage\(int, Base\.ResultCallback\)$/.test(m.signature);
+}
+
+// Concrete query types are the verified call targets; the open-generic base
+// name is not (the plain base `VirtualQuery::` name gets MissingMethod).
+function isOpenGenericQueryBase(svcName: string): boolean {
+  return svcName === 'VirtualQuery`2';
+}
+
 const factoryEntries: string[] = [];
 
 for (const svc of catalog.services) {
@@ -271,7 +289,13 @@ for (const svc of catalog.services) {
       });
       body += `  /**\n${notes.join('\n')}\n   */\n`;
     }
-    if (m.expectsResponse) {
+    if (isOpenGenericQueryBase(svc.name) && (m.name === 'RetainPage' || m.name === 'ReleasePage')) {
+      body += `  /** Prefer the concrete query class: page calls are verified only under the\n   * derived declaring type (e.g. VirtualAlbumLiteQuery), not this open-generic name. */\n`;
+    }
+    if (neverResponds(m)) {
+      body += `  /** Fire-and-forget: the Core releases the page but never answers. Call exactly\n   * once per successful retainPage and never retry — over-releasing corrupts the\n   * Core's page refcount. */\n`;
+    }
+    if (m.expectsResponse && !neverResponds(m)) {
       body += `  async ${mname}(${tsParams}): Promise<CallResult> {
     const parts: Buffer[] = [
 ${parts}

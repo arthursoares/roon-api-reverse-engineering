@@ -1,4 +1,4 @@
-import { EndpointApi, LibraryApi, TransportApi, ZoneApi, makeApi } from './api';
+import { EndpointApi, LibraryApi, TransportApi, VirtualAlbumLiteQueryApi, VirtualHistoryPlayQueryApi, ZoneApi, makeApi } from './api';
 
 /** Minimal stub standing in for a connected RoonClient. */
 function stub() {
@@ -95,6 +95,29 @@ describe('generated API (Phase B codegen)', () => {
     z.pause();
     expect(noReply).toHaveLength(1);
     expect(noReply[0].sig).toBe('Sooloos.Broker.Api.Zone::Pause()');
+  });
+
+  test('ReleasePage is fire-and-forget: the Core never answers it', () => {
+    // Awaiting it waited out the request timeout and rejected after a release
+    // that had succeeded — inviting a retry, i.e. a double release.
+    const { c, calls, noReply } = stub();
+    const albums = new VirtualAlbumLiteQueryApi(c, 77n);
+    expect(albums.releasePage(0)).toBeUndefined();
+    new VirtualHistoryPlayQueryApi(c, 78n).releasePage(2);
+    expect(calls).toHaveLength(0);
+    expect(noReply.map((r) => r.sig)).toEqual([
+      'Sooloos.Broker.Api.VirtualAlbumLiteQuery::ReleasePage(int, Base.ResultCallback)',
+      'Sooloos.Broker.Api.VirtualHistoryPlayQuery::ReleasePage(int, Base.ResultCallback)',
+    ]);
+    expect(noReply[1].args.toString('hex')).toBe('02');
+  });
+
+  test('RetainPage still awaits its reply', async () => {
+    const { c, calls, noReply } = stub();
+    const r = await new VirtualAlbumLiteQueryApi(c, 77n).retainPage(0);
+    expect(r.success).toBe(true);
+    expect(calls).toHaveLength(1);
+    expect(noReply).toHaveLength(0);
   });
 
   test('makeApi exposes service accessors', () => {
