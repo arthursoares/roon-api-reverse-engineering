@@ -79,3 +79,6 @@ Three ideas explain almost everything:
 - **[Wire format](/protocol/wire-format/)** — framing, varints, and primitive encodings.
 - **[Calls & objects](/protocol/calls-and-objects/)** — how method calls, by-val struct
   arguments, and the object graph (responses/pushes) are encoded.
+- **[Object lifetime](/protocol/object-lifetime/)** — what the Core keeps alive per
+  connection, how releases work (`GCOBJS`, `RetainPage`/`ReleasePage`), and the rules a
+  client should follow.
