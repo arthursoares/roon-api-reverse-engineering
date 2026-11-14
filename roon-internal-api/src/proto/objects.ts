@@ -61,7 +61,7 @@ export class ObjectGraph {
       case 7: this.defineType(r); return true;   // DEFTYPE
       case 3: this.pushObj(r, true); return true; // PUSHOBJ (populate)
       case 4: this.pushObj(r, false); return true; // PUSHSTUB (no fields)
-      case 5: this.pushObj(r, true); return true; // UPDATEOBJ (re-populate)
+      case 5: this.pushObj(r, true, true); return true; // UPDATEOBJ (re-populate)
       default: return false;
     }
   }
@@ -79,12 +79,15 @@ export class ObjectGraph {
     this.types.set(id, { id, name, members });
   }
 
-  private pushObj(r: BinaryReader, populate: boolean): void {
+  private pushObj(r: BinaryReader, populate: boolean, update = false): void {
     const oid = r.flexLong();
     const typeId = r.flexInt();
     const def = this.types.get(typeId);
     const typeName = def?.name ?? `#${typeId}`;
     const fields: Record<string, unknown> = {};
+    // Set once a sparse body is read through its terminator, so every member
+    // the server sent is in `fields`.
+    let complete = false;
     if (populate && def) {
       const dataList = /(?:^|\.)DataList<(.+)>$/.exec(typeName);
       if (dataList) {
@@ -146,7 +149,7 @@ export class ObjectGraph {
         // terminates), then value, per the member's PropertyType.
         for (;;) {
           const idx = r.flexInt();
-          if (idx === 0) break;
+          if (idx === 0) { complete = true; break; }
           const member = def.members[idx - 1];
           if (!member) break; // unknown index — can't advance; stop
           try {
@@ -161,6 +164,16 @@ export class ObjectGraph {
     const existing = this.objects.get(key);
     if (existing) {
       // PUSHSTUB adds a reference; it does not erase an already loaded object.
+      // UPDATEOBJ re-populates the whole object: a member absent from its
+      // sparse body is back at its default (live: an Album pushed with
+      // IsLoading=true gets updates that omit IsLoading once loading ends).
+      // Clear in place so held `fields` references see the update, and only
+      // after a complete decode, so a body we could not finish reading never
+      // drops members it did not reach. Collections already replace
+      // $count/$items wholesale below.
+      if (update && complete) {
+        for (const key of Object.keys(existing.fields)) delete existing.fields[key];
+      }
       if (populate) Object.assign(existing.fields, fields);
     } else {
       this.objects.set(key, { oid, typeId, typeName, fields });
