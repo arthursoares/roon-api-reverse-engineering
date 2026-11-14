@@ -35,6 +35,14 @@ function pushObj(oid: number, typeId: number, fieldsByIndex: [number, Buffer][])
   return encodeRequest(3, w.toBuffer(), null);
 }
 
+/** The same sparse body sent as an UPDATEOBJ (cmd 5). */
+function updateObj(oid: number, typeId: number, fieldsByIndex: [number, Buffer][]): Buffer {
+  const w = new BinaryWriter().long(oid).flexInt(typeId);
+  for (const [idx, val] of fieldsByIndex) w.flexInt(idx).bytes(val);
+  w.flexInt(0); // terminator
+  return encodeRequest(5, w.toBuffer(), null);
+}
+
 describe('ObjectGraph generic deserializer', () => {
   test('decodes a type + object with mixed field types, incl. object refs', () => {
     const g = new ObjectGraph();
@@ -113,6 +121,59 @@ describe('ObjectGraph generic deserializer', () => {
     expect(title.$type).toBe('Wrapper');
     expect(title['Wrapper::Value']).toBe('Hello');
     expect(title['Wrapper::HasEditLayer']).toBe(true);
+  });
+});
+
+describe('UPDATEOBJ re-population', () => {
+  const LOADING = 'Sooloos.Broker.Api.Album::IsLoading';
+  const TITLE = 'Sooloos.Broker.Api.Album::Title';
+  const album = () => defType(40, 'Sooloos.Broker.Api.Album', [
+    [LOADING, PropertyType.Bool],
+    [TITLE, PropertyType.String],
+  ]);
+  const yes = new BinaryWriter().boolean(true).toBuffer();
+  const title = new BinaryWriter().string('Kind of Blue').toBuffer();
+
+  test('a member the update omits is back at its default', () => {
+    // Live (2.73, 2.74 build 1719): a loading Album is pushed with
+    // IsLoading=true, and the update sent once loading ends omits it.
+    const g = new ObjectGraph();
+    feed(g, album(), pushObj(42, 40, [[1, yes], [2, title]]));
+    expect(g.getObject(42n)!.fields[LOADING]).toBe(true);
+    feed(g, updateObj(42, 40, [[2, title]]));
+    expect(g.getObject(42n)!.fields).toEqual({ [TITLE]: 'Kind of Blue' });
+  });
+
+  test('the object and its fields keep their identity across an update', () => {
+    const g = new ObjectGraph();
+    feed(g, album(), pushObj(42, 40, [[1, yes], [2, title]]));
+    const original = g.getObject(42n)!;
+    const held = original.fields;
+    feed(g, updateObj(42, 40, [[2, title]]));
+    expect(g.getObject(42n)).toBe(original);
+    expect(held[LOADING]).toBeUndefined();
+  });
+
+  test('a PUSHSTUB never erases a loaded object', () => {
+    const g = new ObjectGraph();
+    feed(g, album(), pushObj(42, 40, [[1, yes], [2, title]]));
+    feed(g, encodeRequest(4, new BinaryWriter().long(42).flexInt(40).toBuffer(), null));
+    expect(g.getObject(42n)!.fields).toEqual({ [LOADING]: true, [TITLE]: 'Kind of Blue' });
+  });
+
+  test('an update of an undefined type does not wipe the object', () => {
+    const g = new ObjectGraph();
+    feed(g, album(), pushObj(42, 40, [[1, yes], [2, title]]));
+    feed(g, updateObj(42, 41, []));
+    expect(g.getObject(42n)!.fields).toEqual({ [LOADING]: true, [TITLE]: 'Kind of Blue' });
+  });
+
+  test('an update that cannot be read to its terminator keeps the members it did not reach', () => {
+    const g = new ObjectGraph();
+    feed(g, album(), pushObj(42, 40, [[1, yes], [2, title]]));
+    // Member index 9 is not declared, so decoding stops before the terminator.
+    feed(g, updateObj(42, 40, [[9, yes]]));
+    expect(g.getObject(42n)!.fields).toEqual({ [LOADING]: true, [TITLE]: 'Kind of Blue' });
   });
 });
 
