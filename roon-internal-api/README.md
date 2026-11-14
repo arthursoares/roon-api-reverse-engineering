@@ -71,3 +71,8 @@ npm test
 ## Protocol Documentation
 
 See [ROON_INTERNAL_API.md](../docs/ROON_INTERNAL_API.md) for protocol details.
+
+Before keeping a connection open across operations, read
+[Object lifetime](../site/src/content/docs/protocol/object-lifetime.md): the Core holds
+every object it pushes until the client releases it or disconnects, and this SDK never sends
+the release verb (`GCOBJS`). Short-lived connections are the verified release path.
