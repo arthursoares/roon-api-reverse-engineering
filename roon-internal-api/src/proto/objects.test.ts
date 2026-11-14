@@ -191,6 +191,54 @@ describe('DataList collection wire encoding', () => {
     expect(original.fields).toEqual({ $count: 1, $items: [{ $ref: 901n }] });
   });
 
+  describe('a DataList sent as an inline value', () => {
+    const GENRES = 'Sooloos.Broker.Api.AlbumLite::Genres';
+    const LABELS = 'Sooloos.Broker.Api.AlbumLite::Labels';
+    /** Inline value: marker 1, typeId, body length, then the count-first list body. */
+    const inline = (typeId: number, body: Buffer) =>
+      new BinaryWriter().long(1).flexInt(typeId).flexInt(body.length).bytes(body).toBuffer();
+
+    test('decodes count-first on a pushed object (AlbumLite::Genres and ::Labels on search results)', () => {
+      // Live (2.74 build 1719): every AlbumLite in a UnifiedSearch result
+      // carries Genres and Labels this way.
+      const g = new ObjectGraph();
+      feed(
+        g,
+        defType(20, 'Sooloos.Broker.Api.DataList<string>', []),
+        defType(30, 'Sooloos.Broker.Api.AlbumLite', [
+          ['Sooloos.Broker.Api.AlbumLite::Title', PropertyType.String],
+          [GENRES, PropertyType.Object],
+          [LABELS, PropertyType.Object],
+        ]),
+        pushObj(99, 30, [
+          [1, new BinaryWriter().string('Kind of Blue').toBuffer()],
+          [2, inline(20, new BinaryWriter().integer(2).string('Jazz').string('Modal Music').toBuffer())],
+          [3, inline(20, new BinaryWriter().integer(1).string('Columbia').toBuffer())],
+        ])
+      );
+      const f = g.getObject(99n)!.fields;
+      expect(f[GENRES]).toEqual({ $type: 'Sooloos.Broker.Api.DataList<string>', $count: 2, $items: ['Jazz', 'Modal Music'] });
+      expect(f[LABELS]).toEqual({ $type: 'Sooloos.Broker.Api.DataList<string>', $count: 1, $items: ['Columbia'] });
+    });
+
+    test('uses the same element codecs as a pushed list, and an empty list is count 0', () => {
+      const g = new ObjectGraph();
+      feed(g, defType(21, 'Sooloos.Broker.Api.DataList<int>', []), defType(20, 'Sooloos.Broker.Api.DataList<string>', []));
+      const ints = g.decodeReturnValue(Uint8Array.from(inline(21, new BinaryWriter().integer(2).integer(1).integer(2).toBuffer())));
+      expect(ints).toEqual({ $type: 'Sooloos.Broker.Api.DataList<int>', $count: 2, $items: [1, 2] });
+      const empty = g.decodeReturnValue(Uint8Array.from(inline(20, new BinaryWriter().integer(0).toBuffer())));
+      expect(empty).toEqual({ $type: 'Sooloos.Broker.Api.DataList<string>', $count: 0, $items: [] });
+    });
+
+    test('a truncated inline list keeps an incomplete count', () => {
+      const g = new ObjectGraph();
+      feed(g, defType(20, 'Sooloos.Broker.Api.DataList<string>', []));
+      // Declares 2 strings but the inline body holds only the first.
+      const decoded = g.decodeReturnValue(Uint8Array.from(inline(20, new BinaryWriter().integer(2).string('Jazz').toBuffer())));
+      expect(decoded).toEqual({ $type: 'Sooloos.Broker.Api.DataList<string>', $count: 2, $items: ['Jazz'] });
+    });
+  });
+
   test('Query retains its separate sparse count header', () => {
     const g = new ObjectGraph();
     feed(g, defType(20, 'Sooloos.Broker.Api.Query<Sooloos.Broker.Api.AlbumLite>', []));
