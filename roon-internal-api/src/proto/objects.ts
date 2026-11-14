@@ -91,32 +91,7 @@ export class ObjectGraph {
         // Generated DataList<T>_Proxy.Populate reads count directly, then T
         // values; it replaces the backing list on BOTH PUSHOBJ and UPDATEOBJ.
         // Query<T>'s sparse (1,count,0) header below is a different codec.
-        const primitives: Record<string, PropertyType> = {
-          string: PropertyType.String, int: PropertyType.Int, long: PropertyType.Long,
-          double: PropertyType.Double, float: PropertyType.Float, 'System.DateTime': PropertyType.DateTime,
-        };
-        // These DataList enum adapters use ReadInteger in the installed API.
-        const integerEnums = ['DsdStrategy', 'MediaSource', 'TidalStreamFormat',
-          'QobuzStreamFormat', 'KKBoxStreamFormat', 'NugsStreamFormat'];
-        const elementType = dataList[1];
-        const elementCodec = primitives[elementType] ??
-          (integerEnums.some((name) => elementType === `Sooloos.Broker.Api.${name}` ||
-            elementType === `Roon.Broker.Api.${name}`) ? PropertyType.Int : PropertyType.Object);
-        const count = r.integer();
-        const items: unknown[] = [];
-        for (let i = 0; i < count && r.remaining > 0; i++) {
-          try {
-            const item = this.readValue(r, elementCodec);
-            if (r.remaining < 0) break; // Do not invent a ref from a truncated varint.
-            items.push(item);
-          } catch {
-            break;
-          }
-        }
-        // Preserve an incomplete count so callers cannot mistake truncation for
-        // a complete empty result. A later full UPDATEOBJ can replace it.
-        fields.$count = r.pos > r.buf.length && items.length === count ? -1 : count;
-        fields.$items = items;
+        Object.assign(fields, this.readDataList(r, dataList[1]));
       } else if (isCollectionType(typeName)) {
         // Query<T>: a built-in count property at
         // wire-index 1 (DEFTYPE declares no members), 0 terminates, then
@@ -167,6 +142,37 @@ export class ObjectGraph {
     }
   }
 
+  /**
+   * Read a DataList<T> body: count, then `count` T values. Shared by pushed
+   * lists and lists sent as inline values.
+   */
+  private readDataList(r: BinaryReader, elementType: string): { $count: number; $items: unknown[] } {
+    const primitives: Record<string, PropertyType> = {
+      string: PropertyType.String, int: PropertyType.Int, long: PropertyType.Long,
+      double: PropertyType.Double, float: PropertyType.Float, 'System.DateTime': PropertyType.DateTime,
+    };
+    // These DataList enum adapters use ReadInteger in the installed API.
+    const integerEnums = ['DsdStrategy', 'MediaSource', 'TidalStreamFormat',
+      'QobuzStreamFormat', 'KKBoxStreamFormat', 'NugsStreamFormat'];
+    const elementCodec = primitives[elementType] ??
+      (integerEnums.some((name) => elementType === `Sooloos.Broker.Api.${name}` ||
+        elementType === `Roon.Broker.Api.${name}`) ? PropertyType.Int : PropertyType.Object);
+    const count = r.integer();
+    const items: unknown[] = [];
+    for (let i = 0; i < count && r.remaining > 0; i++) {
+      try {
+        const item = this.readValue(r, elementCodec);
+        if (r.remaining < 0) break; // Do not invent a ref from a truncated varint.
+        items.push(item);
+      } catch {
+        break;
+      }
+    }
+    // Preserve an incomplete count so callers cannot mistake truncation for
+    // a complete empty result. A later full UPDATEOBJ can replace it.
+    return { $count: r.pos > r.buf.length && items.length === count ? -1 : count, $items: items };
+  }
+
   /** Read one member value per its PropertyType (ported from PropertyMapping). */
   private readValue(r: BinaryReader, t: PropertyType): unknown {
     switch (t) {
@@ -202,6 +208,11 @@ export class ObjectGraph {
           const sub = new BinaryReader(r.bytes(len));
           const def = this.types.get(tid);
           if (!def) return { $inline: tid };
+          // A DataList<T> sent as an inline value (e.g. AlbumLite::Genres and
+          // ::Labels on search results) has the same count-first body as a
+          // pushed one, not sparse fields.
+          const dataList = /(?:^|\.)DataList<(.+)>$/.exec(def.name);
+          if (dataList) return { $type: def.name, ...this.readDataList(sub, dataList[1]) };
           const obj: Record<string, unknown> = {};
           for (;;) {
             const idx = sub.flexInt();
